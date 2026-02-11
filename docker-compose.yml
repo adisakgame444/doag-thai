@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:alpine
+    container_name: weed_store_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weed_store
+    ports:
+      - '5432:5432'
+    volumes:
+      - weed_data:/var/lib/postgresql/data
+    networks:
+      - weed_store_network
+
+volumes:
+  weed_data:
+
+networks:
+  weed_store_network:
+    driver: bridge

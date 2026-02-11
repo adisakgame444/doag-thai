@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/clean-cart",
+      "schedule":  "0 1 * * *"
+    }
+  ]
+}
+

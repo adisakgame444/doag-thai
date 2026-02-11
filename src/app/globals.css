@@ -1,0 +1,662 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+.custom-select {
+  width: 135px; /* ค่า default */
+}
+
+@media (max-width: 360px) and (max-height: 740px) {
+  .custom-select {
+    width: 100px; /* เฉพาะหน้าจอ 360x740 */
+  }
+}
+
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+
+
+.animate-bounce-slow {
+  animation: bounce-slow 1.2s infinite ease-in-out;
+}
+
+@keyframes slideRightOnce {
+  0% {
+    background-position: left center;
+  }
+  100% {
+    background-position: right center;
+  }
+}
+
+.bg-slide-right-once {
+  animation: slideRightOnce 3s ease-in-out forwards; /* <- สำคัญ */
+}
+
+.sheet-footer {
+  margin-top: 0 !important;
+  align-self: flex-start !important; /* กันไม่ให้ติดขอบล่าง */
+}
+
+@media (min-width: 390px) {
+  .gap-3-custom {
+    gap: 0.75rem; /* เท่ากับ gap-3 ของ Tailwind */
+  }
+}
+
+
+.swiper-pagination {
+  position: relative !important; /* ไม่ให้อยู่ absolute */
+  margin-top: 12px;              /* เว้นช่องลงมาข้างล่าง */
+  text-align: center;
+}
+
+/* ✅ แอนิเมชันเลื่อนขึ้น–ลง */
+@keyframes slide-fade-down {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* ✅ Tailwind Utilities */
+@layer utilities {
+  .animate-slide-fade-down {
+    animation: slide-fade-down 2.5s ease-in-out infinite;
+    animation-play-state: running;
+  }
+
+  /* ✅ หยุดแอนิเมชันตอนเมนูเปิด (แต่ไม่รีเซ็ตเฟรม) */
+  [data-paused="true"] {
+    animation-play-state: paused !important;
+  }
+}
+
+
+
+/* ✅ เปิด native scroll ลื่นบนมือถือ */
+@supports (-webkit-overflow-scrolling: touch) {
+  .scrollable {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ✅ scroll พฤติกรรม smooth */
+html, body {
+  scroll-behavior: smooth;
+}
+
+/* ✅ scrollbar เนียน */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+
+/* .sheet-content[data-state="open"] {
+  animation: sheetSlideIn 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.sheet-content[data-state="closed"] {
+  animation: sheetSlideOut 0.25s ease-in forwards;
+} */
+
+.sheet-content[data-state="open"] {
+  opacity: 1;
+  transform: translateX(0);
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+              opacity 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.sheet-content[data-state="closed"] {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease-in, opacity 0.25s ease-in;
+}
+
+.sheet-content {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  contain: layout paint style;
+}
+
+
+@keyframes sheetSlideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes sheetSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0.8;
+  }
+}
+
+.ultra-smooth-swiper .swiper-slide {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-property: opacity, transform !important;
+}
+
+.ultra-smooth-swiper .swiper-fade {
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+}
+
+.ultra-smooth-swiper .swiper-wrapper {
+  transition-timing-function: ease-in-out !important;
+}
+
+.smooth-swiper .swiper-slide {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important; /* นุ่มแบบ cinematic */
+}
+
+/* ซ่อน scrollbar (แต่ยังเลื่อนได้) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ซ่อน scrollbar แต่ว่ายังเลื่อนได้ */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* @keyframes marquee-slow {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee-slow {
+  animation: marquee-slow 10s linear infinite;
+} */
+
+
+
+.category-gap {
+  gap: 12px; /* default */
+}
+
+/* Android เล็ก 360px */
+@media screen and (width: 360px) {
+  .category-gap {
+    gap: 11.2px;
+  }
+}
+
+/* iPhone 6 / 7 / 8 */
+@media screen and (width: 375px) {
+  .category-gap {
+    gap: 14.1px;
+  }
+}
+
+@media screen and (width: 384px) {
+  .category-gap {
+    gap: 16px;
+  }
+}
+
+/* iPhone 12 / 13 / 14 */
+@media screen and (width: 390px) {
+  .category-gap {
+    gap: 17px;
+  }
+}
+
+@media screen and (width: 393px) {
+  .category-gap {
+    gap: 17.5px;
+  }
+}
+
+/* iPhone Plus / Pro Max */
+@media screen and (width: 411px) {
+  .category-gap {
+    gap: 10.4px;
+  }
+}
+
+@media screen and (width: 412px) {
+  .category-gap {
+    gap: 10.5px;
+  }
+}
+
+/* iPhone Plus / Pro Max */
+@media screen and (width: 414px) {
+  .category-gap {
+    gap: 10.9px;
+  }
+}
+
+@media screen and (width: 428px) {
+  .category-gap {
+    gap: 13.1px;
+  }
+}
+
+@media screen and (width: 430px) {
+  .category-gap {
+    gap: 13.5px;
+  }
+}
+
+/* Tablet / Desktop */
+@media screen and (min-width: 768px) {
+  .category-gap {
+    gap: 21px;
+  }
+}
+
+/* ===============================
+
+   HERO IMAGE SCALE (mobile-first)
+
+   =============================== */
+
+/* 📱 mobile เล็ก (default) */
+
+.hero-image-scale {
+  transform: scaleX(2.25) scaleY(1.94);
+  will-change: transform;
+}
+
+@media (min-width: 360px) {
+  .hero-image-scale {
+    transform: scaleX(2.0) scaleY(1.95);
+  }
+}
+
+@media (min-width: 375px) {
+  .hero-image-scale {
+    transform: scaleX(2.1) scaleY(1.95);
+  }
+}
+
+/* 📱 mobile ใหญ่ (≥390px) */
+
+@media (min-width: 390px) {
+  .hero-image-scale {
+    transform: scaleX(2.2) scaleY(1.95);
+  }
+}
+
+@media (min-width: 393px) {
+  .hero-image-scale {
+    transform: scaleX(2.2) scaleY(1.95);
+  }
+}
+@media (min-width: 412px) {
+  .hero-image-scale {
+    transform: scaleX(2.30) scaleY(1.95);
+  }
+}
+
+@media (min-width: 414px) {
+  .hero-image-scale {
+    transform: scaleX(2.31) scaleY(1.95);
+  }
+}
+/* 📱 mobile ใหญ่มาก / tablet เล็ก (≥430px) */
+
+@media (min-width: 428px) {
+  .hero-image-scale {
+    transform: scaleX(2.37) scaleY(1.95);
+  }
+
+}
+@media (min-width: 430px) {
+  .hero-image-scale {
+    transform: scaleX(2.39) scaleY(1.95);
+  }
+}
+
+/* 📲 tablet (≥768px) */
+
+@media (min-width: 768px) {
+  .hero-image-scale {
+    transform: scaleX(1.4) scaleY(1.4)
+  }
+}
+
+/* 💻 PC (≥1024px) — ไม่ scale */
+
+@media (min-width: 1024px) {
+  .hero-image-scale {
+    transform: scale(1);
+  }
+}
+
+@layer components {
+  .detail-box-responsive {
+    /* ✅ ขนาดสำหรับมือถือ (Mobile) */
+    width: 60px;    /* กว้าง 60px */
+    height: 40px;   /* สูง 40px */
+    
+    /* การจัดกึ่งกลาง */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ✅ ขนาดสำหรับ iPad/PC (หน้าจอใหญ่กว่า 768px) */
+  @media (min-width: 360px) {
+    .detail-box-responsive {
+      width: 42px;  /* ขยายกว้างขึ้น */
+      height: 40px; /* สูงขึ้น */
+    }
+  }
+
+   @media (min-width: 414px) {
+    .detail-box-responsive {
+      width: 60px;  /* ขยายกว้างขึ้น */
+      height: 40px; /* สูงขึ้น */
+    }
+  }
+}
+
+
+@layer components {
+  .responsive-text-size {
+    /* 📱 มือถือ: กำหนดขนาดตัวหนังสือเล็ก */
+    font-size: 10px; /* หรือ 9px ตามต้องการ */
+    line-height: 1.2; /* ปรับความห่างบรรทัดให้พอดี */
+  }
+
+  /* 💻 จอใหญ่ (iPad/PC): ขยายขนาดตัวหนังสือ */
+  @media (min-width: 360px) {
+    .responsive-text-size {
+      font-size: 10px; /* หรือ 13px */
+    }
+  }
+}
+
+
+@layer utilities {
+  /* ตั้งชื่อคลาสใหม่ เช่น .text-responsive-info */
+  .text-responsive-info {
+    font-size: 12px; /* ขนาดเริ่มต้น (มือถือ) */
+    line-height: 1.5; /* กำหนดความสูงบรรทัด (Optional) */
+  }
+
+  @media (min-width: 360px) {
+    .text-responsive-info {
+      font-size: 10px; /* ปรับให้ใหญ่ขึ้น */
+    }
+  }
+
+  /* หน้าจอขนาดกลาง (md) เช่น iPad ขึ้นไป */
+  @media (min-width: 414px) {
+    .text-responsive-info {
+      font-size: 12px; /* ปรับให้ใหญ่ขึ้น */
+    }
+  }
+
+}
+
+
+@layer utilities {
+  /* ... อันเดิมของคุณ ... */
+
+  /* ✅ เพิ่มอันนี้สำหรับรายละเอียดสินค้า (Variant / Category) */
+  .text-responsive-detail {
+    font-size: 11px; /* มือถือ: เอาเล็กหน่อยจะได้ไม่กินที่ */
+    line-height: 1.4;
+  }
+
+  @media (min-width: 360px) {
+    .text-responsive-detail {
+      font-size: 12px; /* iPad: ขยับขึ้นมานิดนึง */
+    }
+  }
+
+  @media (min-width: 414px) {
+    .text-responsive-detail {
+      font-size: 14px; /* Desktop: ขนาดปกติ (เท่า text-sm) */
+    }
+  }
+}
+
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: Montserrat, sans-serif;
+  --font-mono: Source Code Pro, monospace;
+  --font-serif: Merriweather, serif;
+  --radius: 0.5rem;
+  --tracking-tighter: calc(var(--tracking-normal) - 0.05em);
+  --tracking-tight: calc(var(--tracking-normal) - 0.025em);
+  --tracking-wide: calc(var(--tracking-normal) + 0.025em);
+  --tracking-wider: calc(var(--tracking-normal) + 0.05em);
+  --tracking-widest: calc(var(--tracking-normal) + 0.1em);
+  --tracking-normal: var(--tracking-normal);
+  --shadow-2xl: var(--shadow-2xl);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-md: var(--shadow-md);
+  --shadow: var(--shadow);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-2xs: var(--shadow-2xs);
+  --spacing: var(--spacing);
+  --letter-spacing: var(--letter-spacing);
+  --shadow-offset-y: var(--shadow-offset-y);
+  --shadow-offset-x: var(--shadow-offset-x);
+  --shadow-spread: var(--shadow-spread);
+  --shadow-blur: var(--shadow-blur);
+  --shadow-opacity: var(--shadow-opacity);
+  --color-shadow-color: var(--shadow-color);
+  --color-destructive-foreground: var(--destructive-foreground);
+}
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.9711 0.0074 80.7211);
+  --foreground: oklch(0.3 0.0358 30.2042);
+  --card: oklch(0.9711 0.0074 80.7211);
+  --card-foreground: oklch(0.3 0.0358 30.2042);
+  --popover: oklch(0.9711 0.0074 80.7211);
+  --popover-foreground: oklch(0.3 0.0358 30.2042);
+  --primary: oklch(0.5234 0.1347 144.1672);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.9571 0.021 147.636);
+  --secondary-foreground: oklch(0.4254 0.1159 144.3078);
+  --muted: oklch(0.937 0.0142 74.4218);
+  --muted-foreground: oklch(0.4495 0.0486 39.211);
+  --accent: oklch(0.8952 0.0504 146.0366);
+  --accent-foreground: oklch(0.4254 0.1159 144.3078);
+  --destructive: oklch(0.5386 0.1937 26.7249);
+  --border: oklch(0.8805 0.0208 74.6428);
+  --input: oklch(0.8805 0.0208 74.6428);
+  --ring: oklch(0.5234 0.1347 144.1672);
+  --chart-1: oklch(0.6731 0.1624 144.2083);
+  --chart-2: oklch(0.5752 0.1446 144.1813);
+  --chart-3: oklch(0.5234 0.1347 144.1672);
+  --chart-4: oklch(0.4254 0.1159 144.3078);
+  --chart-5: oklch(0.2157 0.0453 145.7256);
+  --sidebar: oklch(0.937 0.0142 74.4218);
+  --sidebar-foreground: oklch(0.3 0.0358 30.2042);
+  --sidebar-primary: oklch(0.5234 0.1347 144.1672);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.8952 0.0504 146.0366);
+  --sidebar-accent-foreground: oklch(0.4254 0.1159 144.3078);
+  --sidebar-border: oklch(0.8805 0.0208 74.6428);
+  --sidebar-ring: oklch(0.5234 0.1347 144.1672);
+  --destructive-foreground: oklch(1 0 0);
+  --font-sans: Montserrat, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: Source Code Pro, monospace;
+  --shadow-color: oklch(0 0 0);
+  --shadow-opacity: 0.1;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-offset-x: 0;
+  --shadow-offset-y: 1px;
+  --letter-spacing: 0em;
+  --spacing: 0.25rem;
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --tracking-normal: 0em;
+}
+
+.dark {
+  --background: oklch(0.2683 0.0279 150.7681);
+  --foreground: oklch(0.9423 0.0097 72.6595);
+  --card: oklch(0.3327 0.0271 146.9867);
+  --card-foreground: oklch(0.9423 0.0097 72.6595);
+  --popover: oklch(0.3327 0.0271 146.9867);
+  --popover-foreground: oklch(0.9423 0.0097 72.6595);
+  --primary: oklch(0.6731 0.1624 144.2083);
+  --primary-foreground: oklch(0.2157 0.0453 145.7256);
+  --secondary: oklch(0.3942 0.0265 142.9926);
+  --secondary-foreground: oklch(0.897 0.0166 142.5518);
+  --muted: oklch(0.3327 0.0271 146.9867);
+  --muted-foreground: oklch(0.8579 0.0174 76.0955);
+  --accent: oklch(0.5752 0.1446 144.1813);
+  --accent-foreground: oklch(0.9423 0.0097 72.6595);
+  --destructive: oklch(0.5386 0.1937 26.7249);
+  --border: oklch(0.3942 0.0265 142.9926);
+  --input: oklch(0.3942 0.0265 142.9926);
+  --ring: oklch(0.6731 0.1624 144.2083);
+  --chart-1: oklch(0.766 0.1179 145.295);
+  --chart-2: oklch(0.7185 0.1417 144.8887);
+  --chart-3: oklch(0.6731 0.1624 144.2083);
+  --chart-4: oklch(0.6291 0.1543 144.2031);
+  --chart-5: oklch(0.5752 0.1446 144.1813);
+  --sidebar: oklch(0.2683 0.0279 150.7681);
+  --sidebar-foreground: oklch(0.9423 0.0097 72.6595);
+  --sidebar-primary: oklch(0.6731 0.1624 144.2083);
+  --sidebar-primary-foreground: oklch(0.2157 0.0453 145.7256);
+  --sidebar-accent: oklch(0.5752 0.1446 144.1813);
+  --sidebar-accent-foreground: oklch(0.9423 0.0097 72.6595);
+  --sidebar-border: oklch(0.3942 0.0265 142.9926);
+  --sidebar-ring: oklch(0.6731 0.1624 144.2083);
+  --destructive-foreground: oklch(0.9423 0.0097 72.6595);
+  --radius: 0.5rem;
+  --font-sans: Montserrat, sans-serif;
+  --font-serif: Merriweather, serif;
+  --font-mono: Source Code Pro, monospace;
+  --shadow-color: oklch(0 0 0);
+  --shadow-opacity: 0.1;
+  --shadow-blur: 3px;
+  --shadow-spread: 0px;
+  --shadow-offset-x: 0;
+  --shadow-offset-y: 1px;
+  --letter-spacing: 0em;
+  --spacing: 0.25rem;
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
+    0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    letter-spacing: var(--tracking-normal);
+  }
+}

@@ -1,0 +1,943 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  accounts      Account[]
+  addresses     Address[]
+  Cart          Cart[]
+  orders        Order[]
+  sessions      Session[]
+
+  reviews Review[]
+
+  // Spin System Relations
+  spinOrders    SpinOrder[]
+  spinQuota     SpinQuota?
+  spinConfig    UserSpinConfig?
+  spinHistories SpinHistory[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  status    String    @default("active")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Product   Product[]
+}
+
+model Product {
+  id            String          @id @default(uuid())
+  title         String
+  lowStock      Float
+  sku           String?
+  description   String
+  cod           Boolean         @default(false)
+  cost          Float           @default(0)
+  stock         Float
+  status        String          @default("active")
+  totalSold     Int             @default(0)
+  type          ProductType     @default(WEIGHT)
+  unitLabel     String          @default("กรัม")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  categoryId    String
+  category      Category        @relation(fields: [categoryId], references: [id])
+  ProductImage  ProductImage[]
+  ProductWeight ProductWeight[]
+  Cart          Cart[]
+  OrderItem     OrderItem[]
+
+  reviews Review[]
+}
+
+model ProductWeight {
+  id        String      @id @default(uuid())
+  name      String?
+  weight    Float
+  basePrice Float
+  price     Float
+  sold      Int         @default(0)
+  productId String
+  product   Product     @relation(fields: [productId], references: [id])
+  Cart      Cart[]
+  OrderItem OrderItem[]
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  url       String
+  fileId    String
+  isMain    Boolean  @default(false)
+  productId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model RecommendedBanner {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  name      String?
+  fileId    String?
+  createdAt DateTime @default(now())
+}
+
+model Cart {
+  id        String        @id @default(uuid())
+  productId String
+  weightId  String
+  userId    String
+  quantity  Int
+  createdAt DateTime      @default(now()) // ← สำคัญมาก ต้องมี
+  updatedAt DateTime      @updatedAt
+  product   Product       @relation(fields: [productId], references: [id])
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weight    ProductWeight @relation(fields: [weightId], references: [id])
+
+  @@unique([userId, productId, weightId])
+  @@map("cart")
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  label       String?
+  recipient   String
+  phone       String
+  line1       String
+  line2       String?
+  province    String
+  district    String
+  subdistrict String
+  postalCode  String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders      Order[]
+
+  @@map("address")
+}
+
+model Order {
+  id                  String         @id @default(uuid())
+  orderNumber         String         @unique
+  userId              String
+  addressId           String?
+  status              OrderStatus    @default(PENDING_PAYMENT)
+  paymentMethod       PaymentMethod
+  paymentStatus       PaymentStatus  @default(PENDING)
+  subtotal            Float
+  shippingFee         Float          @default(0)
+  depositAmount       Float          @default(0)
+  totalAmount         Float
+  requiresCodDeposit  Boolean        @default(false)
+  shippingName        String
+  shippingPhone       String
+  shippingLine1       String
+  shippingLine2       String?
+  shippingProvince    String
+  shippingDistrict    String
+  shippingSubdistrict String
+  shippingPostalCode  String
+  trackingNumber      String?
+  notes               String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  carrier             String?
+  address             Address?       @relation(fields: [addressId], references: [id])
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items               OrderItem[]
+  payments            OrderPayment[]
+
+  @@map("order")
+}
+
+model OrderItem {
+  id             String          @id @default(uuid())
+  orderId        String
+  productId      String?
+  weightId       String?
+  productTitle   String
+  productSku     String?
+  weightValue    Float?
+  unitPrice      Float
+  basePrice      Float?
+  quantity       Int
+  subtotal       Float
+  trackingNumber String?
+  carrier        String?
+  codAvailable   Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product        Product?        @relation(fields: [productId], references: [id])
+  weight         ProductWeight?  @relation(fields: [weightId], references: [id])
+  status         OrderItemStatus @default(NORMAL) // 👈 เพิ่มบรรทัดนี้ครับ
+
+  @@map("order_item")
+}
+
+model OrderPayment {
+  id                String        @id @default(uuid())
+  orderId           String
+  method            PaymentMethod
+  amount            Float
+  slipUrl           String?
+  slipFileId        String?
+  status            PaymentStatus @default(PENDING)
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  // ✅ [เพิ่มใหม่] ฟิลด์สำหรับเก็บข้อมูลการโอนเงินคืนให้ลูกค้า
+  refundBank        String? // ชื่อธนาคาร หรือ "PROMPTPAY"
+  refundAccountName String? // ชื่อบัญชีลูกค้า
+  refundAccountNo   String? // เลขบัญชีลูกค้า (เก็บเฉพาะตัวเลข)
+
+  @@map("order_payment")
+}
+
+// Model Review
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int // คะแนน 1-5
+  comment   String? // ข้อความรีวิว
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // ป้องกัน 1 User รีวิวสินค้าเดิมซ้ำ (Optional)
+  @@unique([userId, productId])
+}
+
+enum OrderItemStatus {
+  NORMAL
+  OUT_OF_STOCK
+  REPLACED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PENDING_VERIFICATION
+  PROCESSING
+  SHIPPED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PROMPTPAY
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  WAITING_VERIFICATION
+  APPROVED
+  REJECTED
+  // ✅ [เพิ่มใหม่] สถานะสำหรับการคืนเงิน
+  PENDING_REFUND // รอแอดมินโอนคืน
+  REFUNDED // แอดมินโอนคืนเรียบร้อยแล้ว
+}
+
+// ✅ 1. เพิ่ม Enum นี้
+enum ProductType {
+  WEIGHT
+  UNIT
+}
+
+// ===== SPIN SYSTEM =====
+enum SpinOrderStatus {
+  PENDING_PAYMENT
+  WAITING_VERIFICATION
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum SpinPaymentMethod {
+  PROMPTPAY
+  MANUAL_TRANSFER
+}
+
+enum SpinPackageStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SpinResultStatus {
+  WIN
+  LOSE
+  CANCELLED
+}
+
+enum SpinQuotaStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum SpinQuotaAction {
+  ADD
+  REMOVE
+  RESET
+}
+
+model SpinPackage {
+  id         String            @id @default(uuid())
+  name       String
+  spinAmount Int               // จำนวนครั้งที่หมุน
+  price      Float
+  imageUrl   String
+  fileId     String?
+  status     SpinPackageStatus @default(ACTIVE)
+  sortOrder  Int               @default(0)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  orders SpinOrder[]
+
+  @@map("spin_package")
+}
+
+model SpinOrder {
+  id            String            @id @default(uuid())
+  orderNumber   String            @unique
+  userId        String
+  packageId     String
+  spinAmount    Int               // จำนวนครั้งที่หมุน
+  totalAmount   Float
+  status        SpinOrderStatus   @default(PENDING_PAYMENT)
+  paymentMethod SpinPaymentMethod
+  note          String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package  SpinPackage        @relation(fields: [packageId], references: [id])
+  payments SpinOrderPayment[]
+
+  @@map("spin_order")
+}
+
+model SpinOrderPayment {
+  id          String            @id @default(uuid())
+  spinOrderId String
+  amount      Float
+  slipUrl     String?
+  slipFileId  String?
+  status      PaymentStatus     @default(PENDING) // ใช้ PaymentStatus เดียวกับ OrderPayment
+  paidAt      DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  order SpinOrder @relation(fields: [spinOrderId], references: [id], onDelete: Cascade)
+
+  @@map("spin_order_payment")
+}
+
+model SpinQuota {
+  id        String          @id @default(uuid())
+  userId    String          @unique
+  total     Int             @default(0) // จำนวนครั้งที่หมุนทั้งหมด
+  used      Int             @default(0) // จำนวนครั้งที่ใช้ไปแล้ว
+  status    SpinQuotaStatus @default(ACTIVE)
+  updatedAt DateTime        @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("spin_quota")
+}
+
+model UserSpinConfig {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  winRateBoost  Float     @default(0) // เพิ่มโอกาสชนะ (%)
+  loseRateBoost Float     @default(0) // เพิ่มโอกาสแพ้ (%)
+  spinCount     Int       @default(0) // นับจำนวนครั้งที่หมุน
+  winCooldown   Int       @default(0) // ต้องหมุนกี่ครั้งถึงจะชนะได้
+  lastWinAt     DateTime?
+  forceWin      Boolean   @default(false) // แอดมินบังคับให้ชนะครั้งถัดไป
+  canWin        Boolean   @default(false) // อนุญาตให้ชนะได้ (ต้องรอแอดมินอนุมัติ)
+  disabledSpin  Boolean   @default(false) // ปิดการใช้งานสปิน
+  updatedAt     DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_spin_config")
+}
+
+model SpinHistory {
+  id         String           @id @default(uuid())
+  userId     String
+  slotIndex  Int              // ตำแหน่งที่หมุนได้
+  result     SpinResultStatus
+  prizeName  String?          // ชื่อรางวัล (ถ้าชนะ)
+  createdAt  DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("spin_history")
+}
+
+
+
+model SpinSlotImage {
+  id        String   @id @default(uuid())
+  imageUrl  String   // URL รูปภาพ Slot
+  fileId    String   // ID ไฟล์รูปภาพ
+  label     String   // ชื่อ/ป้ายกำกับ (เช่น "💎", "🍀")
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("spin_slot_image")
+}
+
+// generator client {
+//   provider = "prisma-client-js"
+//   output   = "../src/generated/prisma"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// ////////////////////////////
+// /// CORE USER / AUTH
+// ////////////////////////////
+
+// model User {
+//   id            String   @id
+//   name          String
+//   email         String   @unique
+//   emailVerified Boolean  @default(false)
+//   image         String?
+//   role          String?
+//   createdAt     DateTime @default(now())
+//   updatedAt     DateTime @default(now()) @updatedAt
+
+//   accounts  Account[]
+//   addresses Address[]
+//   Cart      Cart[]
+//   orders    Order[]
+//   sessions  Session[]
+
+//   // ===== Spin relations (ของเดิม + FIX) =====
+//   spinOrders    SpinOrder[]
+//   spinQuota     SpinQuota?
+//   spinConfigs   UserSpinConfig[]
+//   spinHistories SpinHistory[]
+
+//   // FIX: required opposite relations
+//   spinQuotaLogs      SpinQuotaLog[] @relation("SpinQuotaUser")
+//   spinQuotaAdminLogs SpinQuotaLog[] @relation("SpinQuotaAdmin")
+
+//   @@map("user")
+// }
+
+// model Session {
+//   id        String   @id
+//   expiresAt DateTime
+//   token     String   @unique
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   ipAddress String?
+//   userAgent String?
+//   userId    String
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   @@map("session")
+// }
+
+// model Account {
+//   id                    String    @id
+//   accountId             String
+//   providerId            String
+//   userId                String
+//   accessToken           String?
+//   refreshToken          String?
+//   idToken               String?
+//   accessTokenExpiresAt  DateTime?
+//   refreshTokenExpiresAt DateTime?
+//   scope                 String?
+//   password              String?
+//   createdAt             DateTime  @default(now())
+//   updatedAt             DateTime  @updatedAt
+//   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   @@map("account")
+// }
+
+// model Verification {
+//   id         String   @id
+//   identifier String
+//   value      String
+//   expiresAt  DateTime
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @default(now()) @updatedAt
+
+//   @@map("verification")
+// }
+
+// ////////////////////////////
+// /// PRODUCT / ORDER SYSTEM
+// ////////////////////////////
+
+// model Category {
+//   id        String    @id @default(uuid())
+//   name      String
+//   status    String    @default("active")
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   Product   Product[]
+// }
+
+// model Product {
+//   id            String          @id @default(uuid())
+//   title         String
+//   lowStock      Float
+//   sku           String?
+//   description   String
+//   cod           Boolean         @default(false)
+//   cost          Float           @default(0)
+//   stock         Float
+//   status        String          @default("active")
+//   createdAt     DateTime        @default(now())
+//   updatedAt     DateTime        @updatedAt
+//   categoryId    String
+//   category      Category        @relation(fields: [categoryId], references: [id])
+//   ProductImage  ProductImage[]
+//   ProductWeight ProductWeight[]
+//   Cart          Cart[]
+//   OrderItem     OrderItem[]
+// }
+
+// model ProductWeight {
+//   id        String      @id @default(uuid())
+//   weight    Float
+//   basePrice Float
+//   price     Float
+//   sold      Int         @default(0)
+//   productId String
+//   product   Product     @relation(fields: [productId], references: [id])
+//   Cart      Cart[]
+//   OrderItem OrderItem[]
+// }
+
+// model ProductImage {
+//   id        String   @id @default(uuid())
+//   url       String
+//   fileId    String
+//   isMain    Boolean  @default(false)
+//   productId String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   product   Product  @relation(fields: [productId], references: [id])
+// }
+
+// model RecommendedBanner {
+//   id        String   @id @default(uuid())
+//   imageUrl  String
+//   name      String?
+//   fileId    String?
+//   createdAt DateTime @default(now())
+// }
+
+// model Cart {
+//   id        String        @id @default(uuid())
+//   productId String
+//   weightId  String
+//   userId    String
+//   quantity  Int
+//   createdAt DateTime      @default(now())
+//   updatedAt DateTime      @updatedAt
+//   product   Product       @relation(fields: [productId], references: [id])
+//   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   weight    ProductWeight @relation(fields: [weightId], references: [id])
+
+//   @@unique([userId, productId, weightId])
+//   @@map("cart")
+// }
+
+// model Address {
+//   id          String   @id @default(uuid())
+//   userId      String
+//   label       String?
+//   recipient   String
+//   phone       String
+//   line1       String
+//   line2       String?
+//   province    String
+//   district    String
+//   subdistrict String
+//   postalCode  String
+//   isDefault   Boolean  @default(false)
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+//   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   orders      Order[]
+
+//   @@map("address")
+// }
+
+// model Order {
+//   id                  String         @id @default(uuid())
+//   orderNumber         String         @unique
+//   userId              String
+//   addressId           String?
+//   status              OrderStatus    @default(PENDING_PAYMENT)
+//   paymentMethod       PaymentMethod
+//   paymentStatus       PaymentStatus  @default(PENDING)
+//   subtotal            Float
+//   shippingFee         Float          @default(0)
+//   depositAmount       Float          @default(0)
+//   totalAmount         Float
+//   requiresCodDeposit  Boolean        @default(false)
+//   shippingName        String
+//   shippingPhone       String
+//   shippingLine1       String
+//   shippingLine2       String?
+//   shippingProvince    String
+//   shippingDistrict    String
+//   shippingSubdistrict String
+//   shippingPostalCode  String
+//   trackingNumber      String?
+//   notes               String?
+//   createdAt           DateTime       @default(now())
+//   updatedAt           DateTime       @updatedAt
+//   carrier             String?
+//   address             Address?       @relation(fields: [addressId], references: [id])
+//   user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   items               OrderItem[]
+//   payments            OrderPayment[]
+
+//   @@map("order")
+// }
+
+// model OrderItem {
+//   id           String         @id @default(uuid())
+//   orderId      String
+//   productId    String?
+//   weightId     String?
+//   productTitle String
+//   productSku   String?
+//   weightValue  Float?
+//   unitPrice    Float
+//   basePrice    Float?
+//   quantity     Int
+//   subtotal     Float
+//   codAvailable Boolean        @default(false)
+//   createdAt    DateTime       @default(now())
+//   updatedAt    DateTime       @updatedAt
+//   order        Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+//   product      Product?       @relation(fields: [productId], references: [id])
+//   weight       ProductWeight? @relation(fields: [weightId], references: [id])
+
+//   @@map("order_item")
+// }
+
+// model OrderPayment {
+//   id         String        @id @default(uuid())
+//   orderId    String
+//   method     PaymentMethod
+//   amount     Float
+//   slipUrl    String?
+//   slipFileId String?
+//   status     PaymentStatus @default(PENDING)
+//   paidAt     DateTime?
+//   createdAt  DateTime      @default(now())
+//   updatedAt  DateTime      @updatedAt
+//   order      Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+//   @@map("order_payment")
+// }
+
+// enum OrderStatus {
+//   PENDING_PAYMENT
+//   PENDING_VERIFICATION
+//   PROCESSING
+//   SHIPPED
+//   COMPLETED
+//   CANCELLED
+// }
+
+// enum PaymentMethod {
+//   PROMPTPAY
+//   COD
+// }
+
+// enum PaymentStatus {
+//   PENDING
+//   WAITING_VERIFICATION
+//   APPROVED
+//   REJECTED
+// }
+
+// ////////////////////////////
+// /// SPIN SYSTEM
+// ////////////////////////////
+
+// enum SpinOrderStatus {
+//   PENDING_PAYMENT
+//   WAITING_VERIFICATION
+//   APPROVED
+//   REJECTED
+//   CANCELLED
+// }
+
+// enum SpinPaymentMethod {
+//   PROMPTPAY
+//   MANUAL_TRANSFER
+// }
+
+// enum SpinPackageStatus {
+//   ACTIVE
+//   INACTIVE
+// }
+
+// enum SpinCampaignStatus {
+//   DRAFT
+//   ACTIVE
+//   PAUSED
+//   ENDED
+// }
+
+// enum SpinSlotStatus {
+//   ACTIVE
+//   INACTIVE
+// }
+
+// enum SpinPrizeType {
+//   PRODUCT
+//   DISCOUNT
+//   POINT
+//   NONE
+// }
+
+// enum SpinResultStatus {
+//   WIN
+//   LOSE
+//   CANCELLED
+// }
+
+// enum SpinQuotaStatus {
+//   ACTIVE
+//   SUSPENDED
+// }
+
+// enum SpinQuotaAction {
+//   ADD
+//   REMOVE
+//   RESET
+// }
+
+// model SpinPackage {
+//   id         String            @id @default(uuid())
+//   name       String
+//   spinAmount Int
+//   price      Float
+//   imageUrl   String
+//   fileId     String?
+//   status     SpinPackageStatus @default(ACTIVE)
+//   sortOrder  Int               @default(0)
+//   createdAt  DateTime          @default(now())
+//   updatedAt  DateTime          @updatedAt
+
+//   orders SpinOrder[]
+// }
+
+// model SpinOrder {
+//   id            String            @id @default(uuid())
+//   orderNumber   String            @unique
+//   userId        String
+//   packageId     String
+//   spinAmount    Int
+//   totalAmount   Float
+//   status        SpinOrderStatus   @default(PENDING_PAYMENT)
+//   paymentMethod SpinPaymentMethod
+//   note          String?
+//   createdAt     DateTime          @default(now())
+//   updatedAt     DateTime          @updatedAt
+
+//   user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   package  SpinPackage        @relation(fields: [packageId], references: [id])
+//   payments SpinOrderPayment[]
+// }
+
+// model SpinOrderPayment {
+//   id          String          @id @default(uuid())
+//   spinOrderId String
+//   amount      Float
+//   slipUrl     String?
+//   slipFileId  String?
+//   status      SpinOrderStatus @default(PENDING_PAYMENT)
+//   paidAt      DateTime?
+//   createdAt   DateTime        @default(now())
+//   updatedAt   DateTime        @updatedAt
+
+//   order SpinOrder @relation(fields: [spinOrderId], references: [id], onDelete: Cascade)
+// }
+
+// model SpinCampaign {
+//   id        String             @id @default(uuid())
+//   name      String
+//   status    SpinCampaignStatus @default(DRAFT)
+//   winRate   Int                @default(50) // ✅ % ชนะ (0–100)
+//   createdAt DateTime           @default(now())
+
+//   slots     SpinSlot[]
+//   histories SpinHistory[]
+// }
+
+// model SpinPrize {
+//   id        String        @id @default(uuid())
+//   name      String
+//   type      SpinPrizeType
+//   imageUrl  String
+//   fileId    String?
+//   isActive  Boolean       @default(true)
+//   createdAt DateTime      @default(now())
+
+//   slots           SpinSlot[]
+//   histories       SpinHistory[]
+//   forcedByConfigs UserSpinConfig[]
+// }
+
+// model SpinSlot {
+//   id         String         @id @default(uuid())
+//   campaignId String
+//   slotIndex  Int
+//   prizeId    String
+//   status     SpinSlotStatus @default(ACTIVE)
+
+//   campaign SpinCampaign @relation(fields: [campaignId], references: [id])
+//   prize    SpinPrize    @relation(fields: [prizeId], references: [id])
+
+//   @@unique([campaignId, slotIndex])
+// }
+
+// model SpinQuota {
+//   id        String          @id @default(uuid())
+//   userId    String          @unique
+//   total     Int             @default(0)
+//   used      Int             @default(0)
+//   status    SpinQuotaStatus @default(ACTIVE)
+//   updatedAt DateTime        @updatedAt
+
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }
+
+// model SpinQuotaLog {
+//   id        String          @id @default(uuid())
+//   userId    String
+//   adminId   String
+//   action    SpinQuotaAction
+//   amount    Int
+//   reason    String?
+//   createdAt DateTime        @default(now())
+
+//   user  User @relation("SpinQuotaUser", fields: [userId], references: [id])
+//   admin User @relation("SpinQuotaAdmin", fields: [adminId], references: [id])
+// }
+
+// model UserSpinConfig {
+//   id            String    @id @default(uuid())
+//   userId        String    @unique
+//   winRateBoost  Float     @default(0)
+//   loseRateBoost Float     @default(0)
+//   spinCount     Int       @default(0) // ✅ นับจำนวนครั้งที่หมุน
+//   winCooldown   Int       @default(0) // ต้องหมุนกี่ครั้งถึงจะชนะได้
+//   lastWinAt     DateTime?
+//   forcePrizeId  String?
+//   disabledSpin  Boolean   @default(false)
+//   updatedAt     DateTime  @updatedAt
+
+//   user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   prize SpinPrize? @relation(fields: [forcePrizeId], references: [id])
+// }
+
+// model SpinHistory {
+//   id         String           @id @default(uuid())
+//   userId     String
+//   campaignId String
+//   prizeId    String?
+//   slotIndex  Int
+//   result     SpinResultStatus
+//   createdAt  DateTime         @default(now())
+
+//   user     User         @relation(fields: [userId], references: [id])
+//   campaign SpinCampaign @relation(fields: [campaignId], references: [id])
+//   prize    SpinPrize?   @relation(fields: [prizeId], references: [id])
+// }
+
