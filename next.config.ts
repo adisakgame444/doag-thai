@@ -60,6 +60,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: false,
   experimental: {
     optimizeCss: false, // ปิด lightningcss
     authInterrupts: true,
