@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from '@/lib/get-session'
 import { getSpinQuotaByUserId, getUserSpinConfig } from '@/services/spins'
 import { getActiveSpinSlotImages } from '@/services/spin-slot-images'
-import SlotGameFullscreen from './slot-game-fullscreen'
+import SlotGameFullscreen from './components/slot-game-fullscreen'
 
 export const metadata: Metadata = {
   title: 'Lucky Slot Game',
