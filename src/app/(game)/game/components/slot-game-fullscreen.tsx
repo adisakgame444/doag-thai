@@ -99,17 +99,7 @@ export default function SlotGameFullscreen({
       {/* Premium Slot Machine Header */}
       <div className="relative z-10 pt-6 px-4">
         <div className="flex justify-center">
-          <motion.div
-            className="relative"
-            animate={{
-              boxShadow: [
-                "0 0 20px rgba(234, 179, 8, 0.3)",
-                "0 0 40px rgba(234, 179, 8, 0.5)",
-                "0 0 20px rgba(234, 179, 8, 0.3)",
-              ],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
+          <motion.div className="relative">
             {/* Outer golden frame */}
             <div
               className="px-10 py-3 rounded-xl text-center relative overflow-hidden"

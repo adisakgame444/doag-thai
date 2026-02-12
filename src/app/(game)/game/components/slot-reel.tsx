@@ -157,10 +157,14 @@ export const SlotReel = memo(
                   style={{
                     background: isCenterItem
                       ? "linear-gradient(180deg, rgba(34, 197, 94, 0.4) 0%, rgba(22, 101, 52, 0.6) 100%)"
-                      : "linear-gradient(180deg, rgba(20, 83, 45, 0.3) 0%, rgba(5, 46, 22, 0.5) 100%)",
+                      : spinning
+                        ? "rgba(5, 46, 22, 0.3)" // Simple background during spin
+                        : "linear-gradient(180deg, rgba(20, 83, 45, 0.3) 0%, rgba(5, 46, 22, 0.5) 100%)",
                     border: isCenterItem
                       ? "2px solid rgba(74, 222, 128, 0.5)"
-                      : "1px solid rgba(34, 197, 94, 0.2)",
+                      : spinning
+                        ? "none" // No border during spin
+                        : "1px solid rgba(34, 197, 94, 0.2)",
                     boxShadow: isCenterItem
                       ? "0 0 15px rgba(34, 197, 94, 0.4)"
                       : "none",
@@ -173,10 +177,18 @@ export const SlotReel = memo(
                       alt={item.label}
                       width={50}
                       height={50}
-                      className="object-contain drop-shadow-lg"
+                      className={`object-contain ${
+                        !spinning ? "drop-shadow-lg" : ""
+                      }`}
                     />
                   ) : (
-                    <span className="text-4xl drop-shadow-lg filter drop-shadow-[0_0_10px_rgba(74,222,128,0.6)]">
+                    <span
+                      className={`text-4xl ${
+                        !spinning
+                          ? "drop-shadow-lg filter drop-shadow-[0_0_10px_rgba(74,222,128,0.6)]"
+                          : ""
+                      }`}
+                    >
                       {item.label}
                     </span>
                   )}
