@@ -446,7 +446,7 @@ export default function Hero() {
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: "200px" },
     );
     if (heroRef.current) observer.observe(heroRef.current);
     return () => observer.disconnect();
@@ -499,28 +499,36 @@ export default function Hero() {
               }}
               className="max-w-xl space-y- text-center md:space-y-8 will-change-transform"
             >
-              
-
               <div className="w-full max-w-md mx-auto block md:hidden">
                 <div className="relative">
-                  
                   <input
                     aria-label="ค้นหาสินค้า"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="
-                            w-full 
-                            bg-neutral-900                  /* ✅ เปลี่ยนพื้นหลังเป็นสีดำเข้ม (เดิมเป็นใส) */
-                            text-white placeholder-gray-400 /* ✅ ปรับสี text ให้ตัดกับพื้นดำ */
-                            border border-green-500/50      /* ✅ เพิ่มขอบสีเขียวให้เห็นกรอบชัดเจน */
-                            px-4 py-1.5 pr-20 
-                            text-sm md:text-base 
-                            rounded-[3px]                   /* 🔒 ทรงเหลี่ยมมนเดิมตามที่คุณใช้ */
-                            focus:outline-none focus:ring-2 focus:ring-emerald-500/50 
-                            shadow-lg                       /* ✅ เพิ่มเงาให้ลอยเด่นขึ้น */
-                            transition
-                            "
+    w-full 
+    /* 1. เปลี่ยนพื้นหลังให้ตามธีม (ขาวในโหมดสว่าง / ดำในโหมดมืด) */
+    bg-background dark:bg-neutral-900 
+    
+    /* 2. เปลี่ยนสีตัวหนังสือตามธีม */
+    text-foreground dark:text-white 
+    
+    /* 3. ใช้สีขอบเดียวกับปุ่มหลัก (Primary) */
+    border border-emerald-500/50 
+    
+    px-4 py-1.5 pr-20 
+    text-sm md:text-base 
+    rounded-[3px] 
+    
+    /* 4. สีตอนกด Focus ให้เป็นสีเดียวกับปุ่ม Theme */
+    focus:outline-none focus:ring-2 focus:ring-emerald-500/50 
+    
+    /* 5. เพิ่มการ Transition เพื่อให้สีเปลี่ยนนุ่มนวลพร้อมกับตอนกดปุ่ม ThemeToggle */
+    transition-colors duration-300
+    
+    shadow-lg
+  "
                     placeholder=""
                   />
 

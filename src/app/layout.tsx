@@ -3,13 +3,20 @@ import { Kanit } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
-import FloatingChat from "@/components/ui/floating-chat";
-import { PWAProvider } from "@/context/PWAContext";
+// import FloatingChat from "@/components/ui/floating-chat";
+import { PWAProvider } from "@/context/PWAContext"
+import { Silkscreen } from 'next/font/google';
 
 const kanit = Kanit({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
 });
+
+const pixelFont = Silkscreen({ 
+  weight: ['400', '700'],
+  subsets: ['latin'],
+  variable: '--font-pixel',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -55,7 +62,7 @@ export default function RootLayout({
     //   </body>
     // </html>
     <html lang="en" suppressHydrationWarning>
-      <body className={`${kanit.className} antialiased overflow-x-hidden`}>
+      <body className={`${kanit.className} ${pixelFont.variable} antialiased overflow-x-hidden`}>
         {/* 👇 2. เอา PWAProvider มาครอบ ThemeProvider อีกทีครับ */}
         <PWAProvider>
           <ThemeProvider

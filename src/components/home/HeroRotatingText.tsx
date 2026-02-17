@@ -22,7 +22,7 @@ export const HeroRotatingText = memo(() => {
     return () =>
       window.removeEventListener(
         "mobileMenuToggle",
-        handleToggle as EventListener
+        handleToggle as EventListener,
       );
   }, []);
 
@@ -54,7 +54,8 @@ export const HeroRotatingText = memo(() => {
           }}
           // className="absolute w-full text-center transform-gpu will-change-transform"
           // className="absolute left-0 w-full text-left text-xs text-white/60 transform-gpu will-change-transform"
-          className="absolute left-0 w-full text-left text-xs md:text-sm text-white/50 leading-none truncate transform-gpu will-change-transform mt-1"
+          // className="absolute left-0 w-full text-left text-xs md:text-sm text-white/50 leading-none truncate transform-gpu will-change-transform mt-1"
+          className="absolute left-0 w-full text-left text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-none truncate transform-gpu will-change-transform mt-1"
           style={{
             transform: "translateZ(0)",
             willChange: "transform, opacity, filter",

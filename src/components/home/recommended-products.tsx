@@ -584,7 +584,6 @@
 //   );
 // }
 
-
 import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -601,9 +600,10 @@ interface RecommendedProduct {
   mainImageUrl?: string | null;
   totalSold: number;
   unitLabel?: string | null;
-  price?: number;
+  price: number;
   originalPrice?: number;
   stock?: number;
+  status: string;
 }
 
 /* ---------------------------------------------
@@ -622,7 +622,7 @@ async function RecommendedProductsContent() {
   if (!products?.length) return null;
 
   return (
-    <section className="container mx-auto space-y-4 mb-5 px-2 md:px-0">
+    <section className="container mx-auto space-y-4 mb-5  md:px-0">
       {/* Header */}
       <div className="flex items-center justify-between gap-3 px-1">
         <div className="flex items-center gap-3">
@@ -657,12 +657,12 @@ async function RecommendedProductsContent() {
         <Link
           href="/products"
           className="
-    group flex items-center gap-1.5 
-    rounded-full border border-emerald-500/30 bg-emerald-500/10 
-    px-3 py-1.5 text-[10px] md:text-xs font-bold text-emerald-500 
-    transition-all duration-300 
-    hover:border-emerald-500 hover:bg-emerald-500 hover:text-white 
-    hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] 
+    group flex items-center gap-1.5
+    rounded-full border border-emerald-500/30 bg-emerald-500/10
+    px-3 py-1.5 text-[10px] md:text-xs font-bold text-emerald-500
+    transition-all duration-300
+    hover:border-emerald-500 hover:bg-emerald-500 hover:text-white
+    hover:shadow-[0_0_12px_rgba(16,185,129,0.4)]
     active:scale-95
   "
         >
@@ -692,8 +692,9 @@ async function RecommendedProductsContent() {
           const totalSold = Number(product.totalSold || 0);
           const unit = product.unitLabel || "ชิ้น";
           const isBestSeller = totalSold >= 5;
-          const price = product.price ?? 990;
-          const originalPrice = product.originalPrice ?? 1290;
+          const price = product.price; // ✅ ไม่ต้องมี ?? 990 แล้ว
+          const originalPrice = product.originalPrice; // ✅ ไม่ต้องมี ?? 1290 แล้ว
+          const stock = product.stock ?? 0;
 
           return (
             <Link
@@ -702,7 +703,9 @@ async function RecommendedProductsContent() {
               className="block h-full group"
             >
               {/* Card Container: bg ดำเข้ม, ขอบเทา, มน */}
-              <div className="relative flex h-full flex-col rounded-2xl bg-[#0F0F0F] border border-zinc-800 transition-all duration-300 hover:border-emerald-500/50 hover:-translate-y-1">
+              {/* <div className="relative flex h-full flex-col rounded-2xl bg-[#0F0F0F] border border-zinc-800 transition-all duration-300 hover:border-emerald-500/50 hover:-translate-y-1"> */}
+              {/* <div className="relative flex h-full flex-col rounded-2xl bg-card border-border text-card-foreground   transition-all duration-300 hover:border-emerald-500/50 hover:-translate-y-1"> */}
+              <div className="relative flex h-full flex-col rounded-2xl bg-card text-card-foreground transition-all duration-300 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-emerald-500/50 hover:shadow-md hover:-translate-y-1">
                 {/* --- ส่วนรูปภาพ (มี Padding p-2 หรือ p-3 เพื่อให้รูปไม่ชนขอบ) --- */}
                 <div className="p-2 md:p-3 pb-0">
                   <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-zinc-900">
@@ -739,48 +742,68 @@ async function RecommendedProductsContent() {
 
                     {/* Price Tag มุมขวาล่าง (ในรูป) */}
                     <div className="absolute bottom-1.5 right-1.5 z-20">
-                      <div className="bg-zinc-900/90 backdrop-blur-sm px-2 py-0.5 rounded-full border border-zinc-700">
-                        <span className="text-[9px] md:text-[10px] font-bold text-white">
-                          {price} THB
+                      <div className="bg-background/80 backdrop-blur-md px-2 py-[1px] rounded-full border border-border flex items-center shadow-sm">
+                        <span className="text-[9px] md:text-[10px] font-bold text-foreground leading-none">
+                          {price.toLocaleString()} THB
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
-
                 {/* --- เนื้อหา (ด้านล่าง) --- */}
                 <div className="flex flex-1 flex-col p-3 pt-2">
                   {/* ชื่อสินค้า */}
-                  <h3 className="line-clamp-1 text-xs md:text-sm font-bold text-white mb-1">
+                  {/* <h3 className="line-clamp-1 text-xs md:text-sm font-bold text-white mb-1"> */}
+                  <h3 className="line-clamp-1 text-xs md:text-sm font-bold text-slate-600 dark:text-slate-200 mb-1 group-hover:text-emerald-600 transition-colors">
                     {product.title}
                   </h3>
 
-                  <p className="text-[9px] text-zinc-500 mb-2">ราคาสินค้า</p>
+                  {/* <p className="text-[9px] text-zinc-500 ">ราคาสินค้า</p> */}
+                  <div className="flex items-center gap-1.5 mb-1">
+                    {/* แท่งสีเขียว (หรือสีธีม) นำหน้า */}
+                    <div className="h-3 w-[3px] rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
+
+                    {/* ตัวหนังสือ */}
+                    <span className="text-[10px] font-semibold tracking-widest text-zinc-400 uppercase">
+                      ราคาสินค้า
+                    </span>
+                  </div>
 
                   {/* ราคา (ขีดฆ่า + ราคาแดง) */}
-                  <div className="flex items-end justify-between mb-3">
-                    <div className="flex items-baseline gap-2">
+                  <div className="flex items-end justify-between mb-1">
+                    <div className="flex items-baseline gap-1">
                       {originalPrice && originalPrice > price && (
-                        <span className="text-[10px] text-zinc-500 line-through">
-                          ฿{originalPrice.toLocaleString()}
+                        <span className="text-[9px] text-zinc-500 line-through">
+                          {originalPrice.toLocaleString()}฿
                         </span>
                       )}
-                      <span className="text-sm md:text-base font-extrabold text-[#EF4444]">
-                        ฿{price.toLocaleString()}
+                      <span className="text-xs md:text-sm font-extrabold text-[#EF4444]">
+                        {price.toLocaleString()}฿
                       </span>
                     </div>
 
                     {/* Badge สถานะ (พร้อมขาย) */}
-                    <div className="bg-green-500/10 px-2 py-[2px] rounded-full border border-green-500/20">
-                      <span className="text-[8px] font-bold text-green-500 block leading-none">
-                        พร้อมขาย
+                    <div
+                      className={`px-2 py-[2px] rounded-full border ${
+                        stock > 0 // ✅ แก้ตรงนี้: ใช้ stock (ตัวแปรที่เราสร้างไว้) ไม่ใช่ product.stock
+                          ? "bg-green-500/10 border-green-500/20"
+                          : "bg-red-500/10 border-red-500/20"
+                      }`}
+                    >
+                      <span
+                        className={`text-[8px] font-bold block leading-none ${
+                          stock > 0 ? "text-green-500" : "text-red-500" // ✅ แก้ตรงนี้ด้วย
+                        }`}
+                      >
+                        {stock > 0 ? "พร้อมขาย" : "สินค้าหมด"}{" "}
+                        {/* ✅ และตรงนี้ด้วย */}
                       </span>
                     </div>
                   </div>
 
                   {/* ปุ่มสั่งซื้อ (ขาว มนๆ) */}
-                  <div className="mt-auto space-y-1.5">
-                    <button className="w-full rounded-xl bg-white py-1.5 text-[10px] md:text-xs font-bold text-black shadow-sm transition-transform active:scale-95 hover:bg-zinc-100">
+                  <div className="mt-auto">
+                    <button className="w-full rounded-xl bg-emerald-600 py-1.5 text-[10px] md:text-xs font-bold text-white shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-500/40 active:scale-95">
                       สั่งซื้อสินค้า
                     </button>
 

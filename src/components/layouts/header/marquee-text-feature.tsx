@@ -250,6 +250,207 @@
 
 // export default memo(MarqueeTextFeature);
 
+// "use client";
+
+// import { memo, useMemo, useState, useEffect } from "react";
+
+// interface MarqueeTextFeatureProps {
+//   running?: boolean;
+//   text?: string;
+//   speedFactor?: number; // ตัวคูณความเร็ว (แนะนำ 0.15 - 0.2)
+// }
+
+// const MarqueeTextFeature = ({
+//   running = true,
+//   text = "🎉 พบกับสินค้าใหม่ๆ ทุกสัปดาห์ พร้อมโปรโมชั่นสุดพิเศษ! ✨ เติมความสุขให้เต็มปอด ด้วยของดีเกรดพรีเมียมที่เราคัดมาเพื่อคุณ! 💚",
+//   speedFactor = 0.18,
+// }: MarqueeTextFeatureProps) => {
+//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+//   useEffect(() => {
+//     const handleMenuToggle = (event: Event) => {
+//       // แปลงเป็น CustomEvent เพื่อดึงค่า detail
+//       const customEvent = event as CustomEvent;
+//       if (customEvent.detail) {
+//         setIsMenuOpen(customEvent.detail.isOpen);
+//       }
+//     };
+
+//     window.addEventListener("mobileMenuToggle", handleMenuToggle);
+
+//     // คืนค่าเมื่อ Component ถูกทำลาย (Cleanup)
+//     return () => {
+//       window.removeEventListener("mobileMenuToggle", handleMenuToggle);
+//     };
+//   }, []);
+
+//   // ✅ 1. Dynamic Speed: คำนวณความเร็วตามความยาวตัวอักษร
+//   // เพื่อให้ข้อความสั้นหรือยาว "วิ่งด้วยความเร็วที่สม่ำเสมอ" ไม่วิ่งเร็วปรี๊ดตอนข้อความยาว
+//   const duration = useMemo(() => {
+//     const textLength = text.length;
+//     return `${Math.max(10, textLength * speedFactor)}s`;
+//   }, [text, speedFactor]);
+
+//   const shouldRun = running && !isMenuOpen;
+
+//   return (
+//     <div className="relative flex h-full w-full items-center overflow-hidden select-none pointer-events-none">
+//       {/* ✅ 2. Edge fade overlays: แทน mask-image ที่ทำ repaint มากด้วย GPU-friendly gradients */}
+//       {/* ✅ 2. Edge fade overlays: แทน mask-image ที่ทำ repaint มากด้วย GPU-friendly gradients */}
+//       {/* Left fade */}
+//       <div
+//         aria-hidden
+//         className="absolute left-0 top-0 h-full w-16 z-10 pointer-events-none"
+//         style={{
+//           background: "linear-gradient(to right, #111827, rgba(17,24,39,0))",
+//         }}
+//       />
+
+//       {/* Right fade */}
+//       <div
+//         aria-hidden
+//         className="absolute right-0 top-0 h-full w-16 z-10 pointer-events-none"
+//         style={{
+//           background: "linear-gradient(to left, #111827, rgba(17,24,39,0))",
+//         }}
+//       />
+
+//       <style>{`
+//         @keyframes marquee-feature-optimized {
+//           0% { transform: translate3d(0, 0, 0); }
+//           100% { transform: translate3d(-50%, 0, 0); }
+//         }
+//       `}</style>
+
+//       <div
+//         className="flex w-max whitespace-nowrap text-[13px] font-bold text-gray-200 sm:text-xs md:text-sm"
+//         style={{
+//           /* --- 🛡️ ของสำคัญที่พี่สั่งไว้ (GPU Isolation) ห้ามลบ! --- */
+//           transform: "translate3d(0, 0, 0)",
+//           backfaceVisibility: "hidden",
+//           perspective: "1000px",
+//           contain: "paint layout",
+//           willChange: "transform",
+//           /* ----------------------------------------------- */
+
+//           display: "flex",
+//           animation: running
+//             ? `marquee-feature-optimized ${duration} linear infinite`
+//             : "none",
+
+//           /* ✅ ลดงาน CPU: เมื่อไม่วิ่ง (running=false) ให้หยุดคำนวณทันที */
+//           animationPlayState: shouldRun ? "running" : "paused",
+//         }}
+//       >
+//         {/* Render 2 ชุดเพื่อ Seamless Loop */}
+//         <span className="inline-block pr-12">{text}</span>
+//         <span className="inline-block pr-12">{text}</span>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default memo(MarqueeTextFeature);
+
+// "use client";
+
+// import { memo, useMemo, useState, useEffect } from "react";
+
+// interface MarqueeTextFeatureProps {
+//   running?: boolean;
+//   text?: string;
+//   speedFactor?: number; // ตัวคูณความเร็ว (แนะนำ 0.15 - 0.2)
+// }
+
+// const MarqueeTextFeature = ({
+//   running = true,
+//   text = "🎉 พบกับสินค้าใหม่ๆ ทุกสัปดาห์ พร้อมโปรโมชั่นสุดพิเศษ! ✨ เติมความสุขให้เต็มปอด ด้วยของดีเกรดพรีเมียมที่เราคัดมาเพื่อคุณ! 💚",
+//   speedFactor = 0.18,
+// }: MarqueeTextFeatureProps) => {
+//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+//   useEffect(() => {
+//     const handleMenuToggle = (event: Event) => {
+//       // แปลงเป็น CustomEvent เพื่อดึงค่า detail
+//       const customEvent = event as CustomEvent;
+//       if (customEvent.detail) {
+//         setIsMenuOpen(customEvent.detail.isOpen);
+//       }
+//     };
+
+//     window.addEventListener("mobileMenuToggle", handleMenuToggle);
+
+//     // คืนค่าเมื่อ Component ถูกทำลาย (Cleanup)
+//     return () => {
+//       window.removeEventListener("mobileMenuToggle", handleMenuToggle);
+//     };
+//   }, []);
+
+//   // ✅ 1. Dynamic Speed: คำนวณความเร็วตามความยาวตัวอักษร
+//   const duration = useMemo(() => {
+//     const textLength = text.length;
+//     return `${Math.max(10, textLength * speedFactor)}s`;
+//   }, [text, speedFactor]);
+
+//   const shouldRun = running && !isMenuOpen;
+
+//   return (
+//     <div className="relative flex h-full w-full items-center overflow-hidden select-none pointer-events-none">
+//       {/* ✅ 2. แก้ไข Edge fade overlays: เปลี่ยนจากสีดำล้วน เป็น "ครีมในโหมดสว่าง / ดำในโหมดมืด" */}
+
+//       {/* Left fade */}
+//       <div
+//         aria-hidden
+//         className="absolute left-0 top-0 h-full w-16 z-10 pointer-events-none bg-gradient-to-r from-[#FAF7F0] dark:from-neutral-900 to-transparent"
+//       />
+
+//       {/* Right fade */}
+//       <div
+//         aria-hidden
+//         className="absolute right-0 top-0 h-full w-16 z-10 pointer-events-none bg-gradient-to-l from-[#FAF7F0] dark:from-neutral-900 to-transparent"
+//       />
+
+//       <style>{`
+//         @keyframes marquee-feature-optimized {
+//           0% { transform: translate3d(0, 0, 0); }
+//           100% { transform: translate3d(-50%, 0, 0); }
+//         }
+//       `}</style>
+
+//       <div
+//         className="
+//           flex w-max whitespace-nowrap text-[13px] font-bold sm:text-xs md:text-sm
+//           /* ✅ 3. แก้ไขสีตัวหนังสือ: โหมดสว่างเป็นสีเข้ม / โหมดมืดเป็นสีขาว */
+//           text-zinc-800 dark:text-gray-200
+//         "
+//         style={{
+//           /* --- 🛡️ ของสำคัญที่พี่สั่งไว้ (GPU Isolation) ห้ามลบ! --- */
+//           transform: "translate3d(0, 0, 0)",
+//           backfaceVisibility: "hidden",
+//           perspective: "1000px",
+//           contain: "paint layout",
+//           willChange: "transform",
+//           /* ----------------------------------------------- */
+
+//           display: "flex",
+//           animation: running
+//             ? `marquee-feature-optimized ${duration} linear infinite`
+//             : "none",
+
+//           /* ✅ ลดงาน CPU: เมื่อไม่วิ่ง (running=false) ให้หยุดคำนวณทันที */
+//           animationPlayState: shouldRun ? "running" : "paused",
+//         }}
+//       >
+//         {/* Render 2 ชุดเพื่อ Seamless Loop */}
+//         <span className="inline-block pr-12">{text}</span>
+//         <span className="inline-block pr-12">{text}</span>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default memo(MarqueeTextFeature);
+
 "use client";
 
 import { memo, useMemo, useState, useEffect } from "react";
@@ -257,7 +458,7 @@ import { memo, useMemo, useState, useEffect } from "react";
 interface MarqueeTextFeatureProps {
   running?: boolean;
   text?: string;
-  speedFactor?: number; // ตัวคูณความเร็ว (แนะนำ 0.15 - 0.2)
+  speedFactor?: number;
 }
 
 const MarqueeTextFeature = ({
@@ -269,23 +470,17 @@ const MarqueeTextFeature = ({
 
   useEffect(() => {
     const handleMenuToggle = (event: Event) => {
-      // แปลงเป็น CustomEvent เพื่อดึงค่า detail
       const customEvent = event as CustomEvent;
       if (customEvent.detail) {
         setIsMenuOpen(customEvent.detail.isOpen);
       }
     };
-
     window.addEventListener("mobileMenuToggle", handleMenuToggle);
-
-    // คืนค่าเมื่อ Component ถูกทำลาย (Cleanup)
     return () => {
       window.removeEventListener("mobileMenuToggle", handleMenuToggle);
     };
   }, []);
 
-  // ✅ 1. Dynamic Speed: คำนวณความเร็วตามความยาวตัวอักษร
-  // เพื่อให้ข้อความสั้นหรือยาว "วิ่งด้วยความเร็วที่สม่ำเสมอ" ไม่วิ่งเร็วปรี๊ดตอนข้อความยาว
   const duration = useMemo(() => {
     const textLength = text.length;
     return `${Math.max(10, textLength * speedFactor)}s`;
@@ -294,27 +489,16 @@ const MarqueeTextFeature = ({
   const shouldRun = running && !isMenuOpen;
 
   return (
-    <div className="relative flex h-full w-full items-center overflow-hidden select-none pointer-events-none">
-      {/* ✅ 2. Edge fade overlays: แทน mask-image ที่ทำ repaint มากด้วย GPU-friendly gradients */}
-      {/* ✅ 2. Edge fade overlays: แทน mask-image ที่ทำ repaint มากด้วย GPU-friendly gradients */}
-      {/* Left fade */}
-      <div
-        aria-hidden
-        className="absolute left-0 top-0 h-full w-16 z-10 pointer-events-none"
-        style={{
-          background: "linear-gradient(to right, #111827, rgba(17,24,39,0))",
-        }}
-      />
-
-      {/* Right fade */}
-      <div
-        aria-hidden
-        className="absolute right-0 top-0 h-full w-16 z-10 pointer-events-none"
-        style={{
-          background: "linear-gradient(to left, #111827, rgba(17,24,39,0))",
-        }}
-      />
-
+    <div
+      className="relative flex h-full w-full items-center overflow-hidden select-none pointer-events-none"
+      style={{
+        /* ✅ Mask Image: ทำให้ขอบซ้ายขวาจางหายไปเอง โดยไม่ต้องมี Div มาบัง */
+        maskImage:
+          "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
+        WebkitMaskImage:
+          "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
+      }}
+    >
       <style>{`
         @keyframes marquee-feature-optimized {
           0% { transform: translate3d(0, 0, 0); }
@@ -323,28 +507,30 @@ const MarqueeTextFeature = ({
       `}</style>
 
       <div
-        className="flex w-max whitespace-nowrap text-[13px] font-bold text-gray-200 sm:text-xs md:text-sm"
+        className="
+          flex w-max whitespace-nowrap text-[13px] font-bold sm:text-xs md:text-sm
+         text-gray-700 dark:text-gray-300
+        "
         style={{
-          /* --- 🛡️ ของสำคัญที่พี่สั่งไว้ (GPU Isolation) ห้ามลบ! --- */
           transform: "translate3d(0, 0, 0)",
           backfaceVisibility: "hidden",
           perspective: "1000px",
           contain: "paint layout",
           willChange: "transform",
-          /* ----------------------------------------------- */
-
           display: "flex",
           animation: running
             ? `marquee-feature-optimized ${duration} linear infinite`
             : "none",
-
-          /* ✅ ลดงาน CPU: เมื่อไม่วิ่ง (running=false) ให้หยุดคำนวณทันที */
           animationPlayState: shouldRun ? "running" : "paused",
         }}
       >
-        {/* Render 2 ชุดเพื่อ Seamless Loop */}
+        {/* ชุดที่ 1: สำหรับให้อ่านปกติ */}
         <span className="inline-block pr-12">{text}</span>
-        <span className="inline-block pr-12">{text}</span>
+
+        {/* ชุดที่ 2: เงาสำหรับ Loop (ซ่อนไม่ให้ Screen Reader อ่านซ้ำ) */}
+        <span className="inline-block pr-12" aria-hidden="true">
+          {text}
+        </span>
       </div>
     </div>
   );

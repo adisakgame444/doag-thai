@@ -201,7 +201,7 @@ export default async function ProductPage({ searchParams }: ProductPageProps) {
   const TOTAL_PAGES = 12; // 🔴 ใช้ค่าจริงของคุณ
 
   return (
-    <div className="container mx-auto py-6 md:px-0 px-[15px] space-y-6">
+    <div className="container mx-auto py-4 md:px-0 px-[9px] space-y-6">
       {/* ✅ Search box อยู่ที่เดิม ไม่โดน swipe */}
       <ProductSearchBox initialValue={search} />
 

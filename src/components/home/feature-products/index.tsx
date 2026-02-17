@@ -609,7 +609,7 @@ export default async function FeatureProducts() {
       {/* 1. Mobile Category Navigation */}
       <div className="lg:hidden w-full flex justify-center mb-1">
         <div className="w-full max-w-[500px]">
-          <div className="bg-neutral-900/95 backdrop-blur-md rounded-t-xl p-2 border-x border-t border-green-500/50 shadow-[0_-5px_15px_-5px_rgba(34,197,94,0.2)]">
+          <div className="bg-[#FAF7F0]/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-t-xl p-2 border-x border-t border-green-500/50 shadow-[0_-5px_15px_-5px_rgba(34,197,94,0.2)] transition-colors duration-300">
             <CategorySection categories={categories} />
           </div>
         </div>

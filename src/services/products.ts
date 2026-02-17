@@ -344,7 +344,6 @@ export async function getProductById(
   } as ProductWithMainImage; // ใช้ 'as' เพื่อยืนยันกับ TypeScript
 }
 
-
 async function ensureActiveCategory(categoryId: string) {
   const category = await db.category.findUnique({
     where: { id: categoryId, status: "active" },
@@ -586,6 +585,10 @@ export interface TopSellerSummary {
   totalSold: number;
   mainImageUrl: string | null;
   unitLabel: string | null; // ✅ เพิ่มตรงนี้
+  price: number;
+  originalPrice: number;
+  status: string;
+  stock: number;
 }
 
 export async function getLowStockProducts(
@@ -659,7 +662,7 @@ export async function getTopSellerProducts(
     },
     // ✅ 1. เปลี่ยนมาใช้การเรียงลำดับจาก Database โดยตรง (เร็วกว่าและถูกต้องกว่า)
     orderBy: {
-      totalSold: "desc", 
+      totalSold: "desc",
     },
     take: limit,
     select: {
@@ -667,22 +670,51 @@ export async function getTopSellerProducts(
       title: true,
       totalSold: true, // ✅ 2. ดึงค่าจากฟิลด์ใหม่โดยตรง (ไม่ต้องวนลูปบวกเองแล้ว)
       unitLabel: true, // ✅ 3. ดึงหน่วยนับ (กรัม/ขวด/ชิ้น)
+      status: true,
+      stock: true,
       ProductImage: {
         where: { isMain: true },
         take: 1,
         select: { url: true },
       },
+      ProductWeight: {
+        take: 1,
+        orderBy: { price: "asc" },
+        select: {
+          price: true,
+          basePrice: true,
+        },
+      },
     },
   });
 
-  return products.map((product) => ({
-    id: product.id,
-    title: product.title,
-    // ใช้ค่าจาก DB เลย หรือถ้าเป็น null ให้เป็น 0
-    totalSold: product.totalSold ?? 0, 
-    unitLabel: product.unitLabel, // ✅ ส่งค่าออกไป
-    mainImageUrl: product.ProductImage[0]?.url ?? null,
-  }));
+  // return products.map((product) => ({
+  //   id: product.id,
+  //   title: product.title,
+  //   // ใช้ค่าจาก DB เลย หรือถ้าเป็น null ให้เป็น 0
+  //   totalSold: product.totalSold ?? 0,
+  //   unitLabel: product.unitLabel, // ✅ ส่งค่าออกไป
+  //   mainImageUrl: product.ProductImage[0]?.url ?? null,
+  // }));
+  return products.map((product) => {
+    // ✅ 1. ต้องประกาศข้างในนี้ (ตอนที่ product เกิดขึ้นแล้ว)
+    const firstOption = product.ProductWeight[0];
+
+    // ✅ 2. แล้วค่อย return ค่าออกไป
+    return {
+      id: product.id,
+      title: product.title,
+      totalSold: product.totalSold ?? 0,
+      unitLabel: product.unitLabel,
+      mainImageUrl: product.ProductImage[0]?.url ?? null,
+
+      // ตอนนี้เรียกใช้ได้แล้ว ไม่แดงแน่นอน
+      price: firstOption?.price ?? 0,
+      originalPrice: firstOption?.basePrice ?? 0,
+      status: product.status,
+      stock: Number(product.stock), // แปลงเป็นตัวเลขให้ชัวร์
+    };
+  });
 }
 
 export async function listRecommendedProducts(limit = 8) {
