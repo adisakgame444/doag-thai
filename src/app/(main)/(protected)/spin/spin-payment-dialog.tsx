@@ -4,7 +4,14 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format-price";
 import { SpinPackage } from "@/generated/prisma/client";
@@ -32,7 +39,9 @@ export default function SpinPaymentDialog({
   isPending,
 }: SpinPaymentDialogProps) {
   const router = useRouter();
-  const [paymentMethod, setPaymentMethod] = useState<"PROMPTPAY" | "MANUAL_TRANSFER">("PROMPTPAY");
+  const [paymentMethod, setPaymentMethod] = useState<
+    "PROMPTPAY" | "MANUAL_TRANSFER"
+  >("PROMPTPAY");
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [slipPreview, setSlipPreview] = useState<string | null>(null);
   const [slipUrl, setSlipUrl] = useState<string | null>(null);
@@ -133,7 +142,9 @@ export default function SpinPaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] sm:max-w-[500px] md:max-w-[800px] max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader className="space-y-1">
-          <DialogTitle className="text-lg sm:text-xl">ชำระเงินแพคเกจสปิน</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">
+            ชำระเงินแพคเกจสปิน
+          </DialogTitle>
           <DialogDescription className="text-sm">
             {spinPackage.name} - {spinPackage.spinAmount} ครั้ง
           </DialogDescription>
@@ -144,7 +155,9 @@ export default function SpinPaymentDialog({
           <div className="bg-muted p-3 sm:p-4 rounded-lg text-sm">
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-muted-foreground">จำนวนครั้งที่หมุน:</span>
-              <span className="font-semibold">{spinPackage.spinAmount} ครั้ง</span>
+              <span className="font-semibold">
+                {spinPackage.spinAmount} ครั้ง
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">ยอดที่ต้องชำระ:</span>
@@ -168,7 +181,9 @@ export default function SpinPaymentDialog({
               </Button>
               <Button
                 type="button"
-                variant={paymentMethod === "MANUAL_TRANSFER" ? "default" : "outline"}
+                variant={
+                  paymentMethod === "MANUAL_TRANSFER" ? "default" : "outline"
+                }
                 onClick={() => setPaymentMethod("MANUAL_TRANSFER")}
                 className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
               >
@@ -184,7 +199,9 @@ export default function SpinPaymentDialog({
               {/* PromptPay QR Code */}
               {paymentMethod === "PROMPTPAY" && (
                 <div className="bg-muted p-3 sm:p-4 rounded-lg text-center">
-                  <p className="text-xs sm:text-sm font-medium mb-2 sm:mb-3">สแกน QR Code เพื่อชำระเงิน</p>
+                  <p className="text-xs sm:text-sm font-medium mb-2 sm:mb-3">
+                    สแกน QR Code เพื่อชำระเงิน
+                  </p>
                   <div className="bg-white p-2 sm:p-3 rounded-lg inline-block mx-auto">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -207,7 +224,7 @@ export default function SpinPaymentDialog({
                   <p className="text-xs sm:text-sm font-medium text-center mb-2 sm:mb-3">
                     ข้อมูลบัญชีสำหรับโอนเงิน
                   </p>
-                  
+
                   <div className="bg-white dark:bg-gray-800 p-2.5 sm:p-3 rounded-lg space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
                     <div className="flex justify-between items-center gap-2">
                       <span className="text-muted-foreground">ธนาคาร:</span>
@@ -218,13 +235,17 @@ export default function SpinPaymentDialog({
                     <div className="flex justify-between items-center gap-2">
                       <span className="text-muted-foreground">ชื่อบัญชี:</span>
                       <span className="font-semibold text-right">
-                        {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || "นาย ตัวอย่าง ทดสอบ"}
+                        {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME ||
+                          "นาย ตัวอย่าง ทดสอบ"}
                       </span>
                     </div>
                     <div className="flex justify-between items-center gap-2">
-                      <span className="text-muted-foreground">เลขที่บัญชี:</span>
+                      <span className="text-muted-foreground">
+                        เลขที่บัญชี:
+                      </span>
                       <span className="font-semibold">
-                        {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER || "123-4-56789-0"}
+                        {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER ||
+                          "123-4-56789-0"}
                       </span>
                     </div>
                     <div className="flex justify-between items-center gap-2 pt-1.5 sm:pt-2 border-t">
@@ -246,7 +267,9 @@ export default function SpinPaymentDialog({
 
             {/* Right Column: Slip Upload */}
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-2">อัปโหลดสลิปการโอนเงิน</label>
+              <label className="text-sm font-medium mb-2">
+                อัปโหลดสลิปการโอนเงิน
+              </label>
               {slipPreview ? (
                 <div className="relative border rounded-lg p-2 min-h-[200px] sm:min-h-[240px]">
                   <div className="relative h-[200px] sm:h-[240px] w-full">
@@ -297,6 +320,7 @@ export default function SpinPaymentDialog({
               )}
               <input
                 type="file"
+                aria-label="อัปโหลดสลิปการโอนเงิน"
                 ref={fileInputRef}
                 className="hidden"
                 accept="image/png,image/jpeg,image/jpg,image/webp"
@@ -308,7 +332,8 @@ export default function SpinPaymentDialog({
 
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-2.5 sm:p-3">
             <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-200">
-              ⚠️ หลังจากอัปโหลดสลิปแล้ว กรุณารอแอดมินอนุมัติก่อนจึงจะสามารถเล่นสปินได้
+              ⚠️ หลังจากอัปโหลดสลิปแล้ว
+              กรุณารอแอดมินอนุมัติก่อนจึงจะสามารถเล่นสปินได้
             </p>
           </div>
         </div>

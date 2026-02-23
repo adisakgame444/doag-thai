@@ -18,7 +18,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { OrderStatus, PaymentMethod, PaymentStatus } from "@/generated/prisma/enums";
+import {
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from "@/generated/prisma/enums";
 import {
   approvePaymentAction,
   rejectPaymentAction,
@@ -201,7 +205,7 @@ export default function OrdersAdminView({
       if (!document.hidden && !isPending) {
         router.refresh();
       }
-    }, 300000); // 5นาที
+    }, 30000); // 5นาที
 
     return () => clearInterval(interval);
   }, [router, isPending]);

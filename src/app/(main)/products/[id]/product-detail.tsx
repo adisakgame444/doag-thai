@@ -1163,6 +1163,10 @@ export default function ProductDetail({
                     className="object-cover"
                     sizes="80px"
                   />
+
+                  {isSoldOut && (
+                    <div className="absolute inset-0 z-10 bg-background/60 backdrop-blur-[1px]" />
+                  )}
                 </button>
               );
             })}

@@ -531,6 +531,7 @@ export async function getSpinHistoryByUserId(
       result: true,
       prizeName: true,
       createdAt: true,
+      isClaimed: true, // ✅ ต้องเช็คว่ามีบรรทัดนี้ไหม!
     },
     orderBy: {
       createdAt: "desc",

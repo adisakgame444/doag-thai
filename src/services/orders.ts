@@ -2424,6 +2424,8 @@ function friendlyError(msg = "เกิดข้อผิดพลาด") {
 const orderWithRelations = {
   include: {
     items: {
+      // ✅ เพิ่มบรรทัดนี้เข้าไปครับ
+      orderBy: { id: "asc" },
       include: {
         weight: true,
         product: {
@@ -2457,6 +2459,7 @@ function mapOrderDetail(order: OrderWithRelations): OrderDetailDTO {
     subtotal: item.subtotal,
     codAvailable: item.codAvailable,
     status: item.status, // 👈 เพิ่มบรรทัดนี้ (สำคัญ! ไม่งั้นหน้าเว็บไม่รู้ว่าของหมด)
+    spinSlotImage: (item as any).spinSlotImage || null,
     trackingNumber: (item as any).trackingNumber || null,
     carrier: (item as any).carrier || null,
     createdAt: item.createdAt,
@@ -2768,9 +2771,10 @@ export async function listOrdersByUser(
 
       include: {
         items: {
-          orderBy: { createdAt: "asc" },
+          orderBy: { id: "asc" },
           include: {
             weight: true,
+            spinSlotImage: true,
             product: {
               include: {
                 // ✅✅✅ แก้ไข: ใช้ชื่อ "ProductImage" ตามที่ประกาศใน Schema ครับ
@@ -2780,7 +2784,7 @@ export async function listOrdersByUser(
           },
         },
         payments: {
-          orderBy: { createdAt: "asc" },
+          orderBy: { id: "asc" },
         },
       },
     });
@@ -2841,17 +2845,23 @@ export async function listOrders(
     const [orders, total] = await db.$transaction([
       db.order.findMany({
         where,
+        // 1. ออเดอร์หลัก เรียงตามเวลาสร้าง (ดีแล้ว)
         orderBy: { createdAt: "desc" },
         include: {
           items: {
-            orderBy: { createdAt: "asc" },
+            // 🚩 แก้จุดที่ 1: รายการสินค้าข้างใน ให้ใช้ id: "asc"
+            // เพราะเวลาลูกค้ากดสั่ง ข้อมูลจะถูกบันทึกพร้อมกันเป๊ะจน createdAt เท่ากัน
+            // การเรียงตาม id จะช่วยให้มันนิ่งที่สุด ไม่ว่าแอดมินจะกดอะไร
+            orderBy: { id: "asc" },
             include: {
-              weight: true, // เพื่อเอาเลข 100 มาใส่ใน variantName
-              product: true, // เพื่อเอาหน่วย เช่น "ขวด" มาใส่ใน unitLabel
+              weight: true,
+              product: true,
             },
           },
           payments: {
-            orderBy: { createdAt: "asc" },
+            // 🚩 แก้จุดที่ 2: สลิปการชำระเงิน ก็ใช้ id: "asc"
+            // เพื่อให้สลิปใบที่ 1, 2, 3 เรียงลำดับเดิมเสมอ
+            orderBy: { id: "asc" },
           },
         },
         skip: pagination.skip,

@@ -1026,6 +1026,7 @@ export default function CartView({ initialItems, userId }: CartViewProps) {
                         alt={item.productTitle}
                         fill
                         className="object-cover"
+                        unoptimized={true}
                       />
                     </div>
 

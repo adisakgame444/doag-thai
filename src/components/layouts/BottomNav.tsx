@@ -73,6 +73,7 @@ import { isActivePath } from "./header/navigation.config";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const mobileMenuItems = NAVIGATION_ITEMS.filter((item) => !item.desktopOnly);
 
   return (
     // ✨ Container หลัก
@@ -81,7 +82,7 @@ export default function BottomNav() {
       {" "}
       {/* 🟢 แก้ตรงนี้: เปลี่ยน grid -> flex และใช้ justify-between + px-6 */}
       <div className="flex justify-between items-center h-[60px] max-w-md mx-auto relative px-6">
-        {NAVIGATION_ITEMS.map((item) => {
+        {mobileMenuItems.map((item) => {
           const isActive = isActivePath(pathname, item.href);
           const Icon = item.icon;
 
