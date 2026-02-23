@@ -557,7 +557,7 @@ function OrderAlertBannerContent() {
     number: string;
   } | null>(null);
 
-  const lastAlertIdRef = useRef<string | null>(null);
+  const lastChangeKeyRef = useRef<string | null>(null);
   const isFetchingRef = useRef(false);
 
   const router = useRouter();
@@ -569,19 +569,19 @@ function OrderAlertBannerContent() {
 
     try {
       const res = await checkOrderOutOfStockAction();
-      const currentId = lastAlertIdRef.current;
-      const newId = res.hasAlert ? (res.orderId ?? null) : null;
+      const currentId = lastChangeKeyRef.current;
+      const newId = res.hasAlert ? (res.changeHash ?? null) : null;
 
       if (currentId !== newId) {
         console.log("Status changed! Refreshing Server & UI...");
-        lastAlertIdRef.current = newId;
+        lastChangeKeyRef.current = newId;
 
         if (res.hasAlert && res.orderId) {
           setAlertData({ id: res.orderId, number: res.orderNumber || "" });
+          router.refresh();
         } else {
           setAlertData(null);
         }
-        router.refresh();
       }
     } catch (error) {
       console.error("Error:", error);
@@ -593,7 +593,7 @@ function OrderAlertBannerContent() {
   useEffect(() => {
     fetchAlert();
 
-    const intervalId = setInterval(fetchAlert, 60000);
+    const intervalId = setInterval(fetchAlert, 30000);
 
     const onFocus = () => fetchAlert();
     window.addEventListener("focus", onFocus);

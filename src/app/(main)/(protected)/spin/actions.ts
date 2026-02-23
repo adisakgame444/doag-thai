@@ -163,7 +163,9 @@ const ClaimRewardSchema = z.object({
       /^[a-zA-Z0-9\u0E00-\u0E7F\s\/\-\.,\(\)\#\:\n\r]+$/,
       "ที่อยู่มีอักขระต้องห้าม (อนุญาตเฉพาะตัวหนังสือ ตัวเลข และเครื่องหมาย / - . , ( ) # : )",
     ),
+  slotImageId: z.string().nullable().optional(), // 🌟 2. เพิ่มบรรทัดนี้เพื่อรองรับ slotImageId
 });
+
 // export async function claimRewardAction(data: {
 //   spinHistoryId: string
 //   prizeName: string
@@ -245,6 +247,7 @@ export async function claimRewardAction(rawInput: unknown) {
   }
 
   const data = parsed.data;
+  console.log("🔴 ข้อมูลที่รับมาจากหน้าเว็บ:", data);
 
   try {
     // 3. ✅ Database Transaction: ทำงานแบบ "ไปพร้อมกัน" หรือ "ล้มเหลวพร้อมกัน"
@@ -277,7 +280,7 @@ export async function claimRewardAction(rawInput: unknown) {
           userId: userId, // ใช้ ID จาก Session
           status: "PENDING_VERIFICATION", // เช็ค Enum ใน Schema ด้วยว่าใช้คำนี้ได้ไหม
           paymentMethod: "COD",
-          paymentStatus: "APPROVED",
+          paymentStatus: "PENDING",
           subtotal: 0,
           totalAmount: 0,
           shippingName: data.shippingName,
@@ -294,6 +297,8 @@ export async function claimRewardAction(rawInput: unknown) {
               quantity: 1,
               unitPrice: 0,
               subtotal: 0,
+              productSku: null, // กลับไปปล่อยว่างไว้ตามหน้าที่ปกติของมัน
+              spinSlotImageId: data.slotImageId,
             },
           },
         },

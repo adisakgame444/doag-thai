@@ -283,9 +283,9 @@ import "swiper/css/bundle"; // ← สำคัญที่สุด
 import { useRef, useEffect } from "react";
 
 const SLIDES = [
-  { src: "/images/TK-image1.jpg", alt: "คัดสรรสินค้า DOAG THAI 1" },
-  { src: "/images/TK-image2.jpg", alt: "คัดสรรสินค้า DOAG THAI 2" },
-  { src: "/images/TK-image3.jpg", alt: "คัดสรรสินค้า DOAG THAI 3" },
+  { src: "/images/TK-image1.webp", alt: "คัดสรรสินค้า DOAG THAI 1" },
+  { src: "/images/TK-image2.webp", alt: "คัดสรรสินค้า DOAG THAI 2" },
+  { src: "/images/TK-image3.webp", alt: "คัดสรรสินค้า DOAG THAI 3" },
 ];
 
 interface Props {

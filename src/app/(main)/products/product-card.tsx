@@ -1144,8 +1144,9 @@ export default function ProductCard({
               alt={product.title}
               src={mainImageUrl}
               fill
+              unoptimized={true}
               className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+              // sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
               priority={isPriority}
             />
 

@@ -11,6 +11,7 @@ export interface OrderItemDTO {
   weightId: string | null;
   productTitle: string;
   productSku: string | null;
+  rewardImageUrl?: string | null;
   weightValue: number | null;
   unitPrice: number;
   basePrice: number | null;
@@ -24,9 +25,13 @@ export interface OrderItemDTO {
   variantName?: string | null;
   trackingNumber?: string | null;
   carrier?: string | null;
+  spinSlotImage?: {
+    imageUrl: string;
+  } | null;
   product?: {
     ProductImage: {
       url: string;
+      isMain: boolean; // ✅ เพิ่มบรรทัดนี้เข้าไปครับ
     }[];
   } | null;
 }

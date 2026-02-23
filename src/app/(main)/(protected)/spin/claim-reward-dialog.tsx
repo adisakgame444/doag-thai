@@ -186,6 +186,8 @@ interface ClaimRewardDialogProps {
   prizeName: string;
   userId: string;
   isClaimed: boolean;
+  // imageUrl: string | null; // ✅ เพิ่มบรรทัดนี้
+  slotImageId?: string | null; // 🌟 1. เพิ่มบรรทัดนี้เพื่อรอรับ ID รูปภาพ
 }
 
 export function ClaimRewardDialog({
@@ -193,6 +195,8 @@ export function ClaimRewardDialog({
   prizeName,
   userId,
   isClaimed,
+  // imageUrl,
+  slotImageId,
 }: ClaimRewardDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -221,6 +225,8 @@ export function ClaimRewardDialog({
       shippingName: formData.name,
       shippingPhone: formData.phone,
       shippingAddress: formData.address,
+      // imageUrl: imageUrl, // ✅ 2. แนบรูปส่งไปให้ Server Action ด้วย
+      slotImageId: slotImageId,
     });
 
     setLoading(false);

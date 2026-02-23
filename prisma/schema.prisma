@@ -237,6 +237,9 @@ model OrderItem {
   weight         ProductWeight?  @relation(fields: [weightId], references: [id])
   status         OrderItemStatus @default(NORMAL) // 👈 เพิ่มบรรทัดนี้ครับ
 
+  spinSlotImage   SpinSlotImage? @relation(fields: [spinSlotImageId], references: [id])
+  spinSlotImageId String?
+
   @@map("order_item")
 }
 
@@ -451,14 +454,15 @@ model SpinHistory {
 }
 
 model SpinSlotImage {
-  id        String   @id @default(uuid())
-  imageUrl  String // URL รูปภาพ Slot
-  fileId    String // ID ไฟล์รูปภาพ
-  label     String // ชื่อ/ป้ายกำกับ (เช่น "💎", "🍀")
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String      @id @default(uuid())
+  imageUrl   String // URL รูปภาพ Slot
+  fileId     String // ID ไฟล์รูปภาพ
+  label      String // ชื่อ/ป้ายกำกับ (เช่น "💎", "🍀")
+  sortOrder  Int         @default(0)
+  isActive   Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
 
   @@map("spin_slot_image")
 }

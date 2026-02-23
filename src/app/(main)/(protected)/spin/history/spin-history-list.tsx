@@ -420,6 +420,7 @@ export default function SpinHistoryList({
               {winningHistory.map((item) => {
                 const imgUrl = getPrizeImage(item.slotIndex);
                 const isClaimed = !!item.isClaimed;
+                const slotImageId = slotImages[item.slotIndex]?.id;
 
                 return (
                   <div
@@ -504,6 +505,8 @@ export default function SpinHistoryList({
                                 prizeName={item.prizeName || "ของรางวัล"}
                                 userId={currentUserId}
                                 isClaimed={isClaimed}
+                                // imageUrl={imgUrl} // ✅ 1. เพิ่มบรรทัดนี้ ส่งรูปเข้าไปใน Dialog
+                                slotImageId={slotImageId}
                               />
                             </div>
                           </div>
