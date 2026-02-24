@@ -30,11 +30,25 @@ interface MobileMenuProps {
  */
 export function MobileMenu({ user }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFullyOpen, setIsFullyOpen] = useState(false);
 
   // ✅ ส่ง event ให้ component อื่น ๆ รับรู้ว่าเมนูเปิด/ปิด
+  // useEffect(() => {
+  //   const event = new CustomEvent("mobileMenuToggle", { detail: { isOpen } });
+  //   window.dispatchEvent(event);
+  // }, [isOpen]);
   useEffect(() => {
     const event = new CustomEvent("mobileMenuToggle", { detail: { isOpen } });
     window.dispatchEvent(event);
+
+    // 🔴 2. เพิ่มโค้ดบล็อกนี้: หน่วงเวลาของหนักๆ ไว้ 500ms
+    if (isOpen) {
+      // รอให้เมนูเลื่อนจบก่อน (500ms) แล้วค่อยเปลี่ยนค่าเป็น true
+      const timer = setTimeout(() => setIsFullyOpen(true), 500);
+      return () => clearTimeout(timer);
+    } else {
+      setIsFullyOpen(false); // ถ้าปิดเมนู ให้รีเซ็ตกลับทันที
+    }
   }, [isOpen]);
 
   return (
@@ -98,7 +112,8 @@ export function MobileMenu({ user }: MobileMenuProps) {
               </div>
 
               {/* ✅ เรียกใช้ MarqueeText component */}
-              <MarqueeText running={isOpen} />
+              {/* <MarqueeText running={isOpen} /> */}
+              <MarqueeText running={isFullyOpen} />
             </div>
           )}
 

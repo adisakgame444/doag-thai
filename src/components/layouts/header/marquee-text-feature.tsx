@@ -451,9 +451,96 @@
 
 // export default memo(MarqueeTextFeature);
 
+// "use client";
+
+// import { memo, useMemo, useState, useEffect } from "react";
+
+// interface MarqueeTextFeatureProps {
+//   running?: boolean;
+//   text?: string;
+//   speedFactor?: number;
+// }
+
+// const MarqueeTextFeature = ({
+//   running = true,
+//   text = "🎉 พบกับสินค้าใหม่ๆ ทุกสัปดาห์ พร้อมโปรโมชั่นสุดพิเศษ! ✨ เติมความสุขให้เต็มปอด ด้วยของดีเกรดพรีเมียมที่เราคัดมาเพื่อคุณ! 💚",
+//   speedFactor = 0.18,
+// }: MarqueeTextFeatureProps) => {
+//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+//   useEffect(() => {
+//     const handleMenuToggle = (event: Event) => {
+//       const customEvent = event as CustomEvent;
+//       if (customEvent.detail) {
+//         setIsMenuOpen(customEvent.detail.isOpen);
+//       }
+//     };
+//     window.addEventListener("mobileMenuToggle", handleMenuToggle);
+//     return () => {
+//       window.removeEventListener("mobileMenuToggle", handleMenuToggle);
+//     };
+//   }, []);
+
+//   const duration = useMemo(() => {
+//     const textLength = text.length;
+//     return `${Math.max(10, textLength * speedFactor)}s`;
+//   }, [text, speedFactor]);
+
+//   const shouldRun = running && !isMenuOpen;
+
+//   return (
+//     <div
+//       className="relative flex h-full w-full items-center overflow-hidden select-none pointer-events-none"
+//       style={{
+//         /* ✅ Mask Image: ทำให้ขอบซ้ายขวาจางหายไปเอง โดยไม่ต้องมี Div มาบัง */
+//         maskImage:
+//           "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
+//         WebkitMaskImage:
+//           "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
+//       }}
+//     >
+//       <style>{`
+//         @keyframes marquee-feature-optimized {
+//           0% { transform: translate3d(0, 0, 0); }
+//           100% { transform: translate3d(-50%, 0, 0); }
+//         }
+//       `}</style>
+
+//       <div
+//         className="
+//           flex w-max whitespace-nowrap text-[13px] font-bold sm:text-xs md:text-sm
+//          text-gray-700 dark:text-gray-300
+//         "
+//         style={{
+//           transform: "translate3d(0, 0, 0)",
+//           backfaceVisibility: "hidden",
+//           perspective: "1000px",
+//           contain: "paint layout",
+//           willChange: "transform",
+//           display: "flex",
+//           animation: running
+//             ? `marquee-feature-optimized ${duration} linear infinite`
+//             : "none",
+//           animationPlayState: shouldRun ? "running" : "paused",
+//         }}
+//       >
+//         {/* ชุดที่ 1: สำหรับให้อ่านปกติ */}
+//         <span className="inline-block pr-12">{text}</span>
+
+//         {/* ชุดที่ 2: เงาสำหรับ Loop (ซ่อนไม่ให้ Screen Reader อ่านซ้ำ) */}
+//         <span className="inline-block pr-12" aria-hidden="true">
+//           {text}
+//         </span>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default memo(MarqueeTextFeature);
+
 "use client";
 
-import { memo, useMemo, useState, useEffect } from "react";
+import { memo, useMemo, useEffect, useRef } from "react";
 
 interface MarqueeTextFeatureProps {
   running?: boolean;
@@ -466,13 +553,17 @@ const MarqueeTextFeature = ({
   text = "🎉 พบกับสินค้าใหม่ๆ ทุกสัปดาห์ พร้อมโปรโมชั่นสุดพิเศษ! ✨ เติมความสุขให้เต็มปอด ด้วยของดีเกรดพรีเมียมที่เราคัดมาเพื่อคุณ! 💚",
   speedFactor = 0.18,
 }: MarqueeTextFeatureProps) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // ✅ 1. เปลี่ยนมาใช้ useRef แทน useState เพื่อหยุดการ Re-render ตอนเปิดเมนู
+  const marqueeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleMenuToggle = (event: Event) => {
       const customEvent = event as CustomEvent;
-      if (customEvent.detail) {
-        setIsMenuOpen(customEvent.detail.isOpen);
+      // ✅ 2. สั่ง DOM โดยตรงให้ paused/running (ทำงานใน 0 มิลลิวิ CPU ไม่กระตุก)
+      if (customEvent.detail !== undefined && marqueeRef.current) {
+        marqueeRef.current.style.animationPlayState = customEvent.detail.isOpen
+          ? "paused"
+          : "running";
       }
     };
     window.addEventListener("mobileMenuToggle", handleMenuToggle);
@@ -486,13 +577,11 @@ const MarqueeTextFeature = ({
     return `${Math.max(10, textLength * speedFactor)}s`;
   }, [text, speedFactor]);
 
-  const shouldRun = running && !isMenuOpen;
-
   return (
     <div
       className="relative flex h-full w-full items-center overflow-hidden select-none pointer-events-none"
       style={{
-        /* ✅ Mask Image: ทำให้ขอบซ้ายขวาจางหายไปเอง โดยไม่ต้องมี Div มาบัง */
+        /* ✅ เก็บ maskImage ของคุณไว้เหมือนเดิมเป๊ะ เพื่อให้ขอบจางสวยงามแบบรูปที่ 4 */
         maskImage:
           "linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)",
         WebkitMaskImage:
@@ -507,10 +596,8 @@ const MarqueeTextFeature = ({
       `}</style>
 
       <div
-        className="
-          flex w-max whitespace-nowrap text-[13px] font-bold sm:text-xs md:text-sm
-         text-gray-700 dark:text-gray-300
-        "
+        ref={marqueeRef} // ✅ 3. เอา ref มาเกาะไว้ตรงนี้เพื่อรอรับคำสั่งหยุด
+        className="flex w-max whitespace-nowrap text-[13px] font-bold sm:text-xs md:text-sm text-gray-600 dark:text-gray-300"
         style={{
           transform: "translate3d(0, 0, 0)",
           backfaceVisibility: "hidden",
@@ -521,13 +608,14 @@ const MarqueeTextFeature = ({
           animation: running
             ? `marquee-feature-optimized ${duration} linear infinite`
             : "none",
-          animationPlayState: shouldRun ? "running" : "paused",
+          // ค่าเริ่มต้น
+          animationPlayState: running ? "running" : "paused",
         }}
       >
         {/* ชุดที่ 1: สำหรับให้อ่านปกติ */}
         <span className="inline-block pr-12">{text}</span>
 
-        {/* ชุดที่ 2: เงาสำหรับ Loop (ซ่อนไม่ให้ Screen Reader อ่านซ้ำ) */}
+        {/* ชุดที่ 2: เงาสำหรับ Loop */}
         <span className="inline-block pr-12" aria-hidden="true">
           {text}
         </span>

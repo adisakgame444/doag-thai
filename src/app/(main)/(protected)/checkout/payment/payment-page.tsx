@@ -1548,17 +1548,17 @@ function SlipUploader({
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (slip?.previewUrl) {
-        try {
-          URL.revokeObjectURL(slip.previewUrl);
-        } catch {
-          // ignore
-        }
-      }
-    };
-  }, [slip]);
+  // useEffect(() => {
+  //   return () => {
+  //     if (slip?.previewUrl) {
+  //       try {
+  //         URL.revokeObjectURL(slip.previewUrl);
+  //       } catch {
+  //         // ignore
+  //       }
+  //     }
+  //   };
+  // }, [slip]);
 
   return (
     <div className="space-y-3 rounded-lg border border-border/60 bg-card p-4 ">

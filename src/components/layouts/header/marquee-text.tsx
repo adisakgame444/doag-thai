@@ -277,6 +277,79 @@
 
 // export default memo(MarqueeText);
 
+// "use client";
+
+// import { memo, useEffect, useState } from "react";
+// import { cn } from "@/lib/utils";
+
+// interface MarqueeTextProps {
+//   running?: boolean;
+//   text?: string;
+// }
+
+// export function MarqueeText({
+//   running = true,
+//   text = "📦 ส่งของทุกวัน! สั่งก่อน 12.00 น. ได้ของไวชัวร์! ⏰🚚 ❤️ ขอบคุณลูกค้าทุกท่านที่ไว้ใจเรานะคะ 🙌 แล้วพบกันอีกน้าา~",
+// }: MarqueeTextProps) {
+//   // ✅ State นี้จะช่วยแก้ปัญหา "เมนูกระตุก" 100%
+//   // เราจะยังไม่แสดง Animation จนกว่าเมนูจะเลื่อนเสร็จ (ประมาณ 500-600ms)
+//   const [isReady, setIsReady] = useState(false);
+
+//   useEffect(() => {
+//     if (running) {
+//       // รอ 600ms (ให้เมนูเลื่อนเปิดให้เสร็จก่อน) ค่อยเริ่มรันตัววิ่ง
+//       const timer = setTimeout(() => {
+//         setIsReady(true);
+//       }, 600);
+//       return () => clearTimeout(timer);
+//     } else {
+//       setIsReady(false);
+//     }
+//   }, [running]);
+
+//   return (
+//     <div className="relative flex h-full items-center overflow-hidden select-none pointer-events-none">
+//       <style>{`
+//         @keyframes ticker-scroll {
+//           0% { transform: translate3d(100%, 0, 0); } /* เริ่มจากขวาสุด */
+//           100% { transform: translate3d(-100%, 0, 0); } /* วิ่งไปซ้ายสุด */
+//         }
+
+//         .ticker-track {
+//           /* ใช้ will-change เพื่อบอก GPU ให้เตรียมตัว */
+//           will-change: transform;
+//           /* ใช้ transform 3D เพื่อเปิด Hardware Acceleration */
+//           transform: translateZ(0);
+//           /* ห้ามขึ้นบรรทัดใหม่ */
+//           white-space: nowrap;
+//           /* กว้างเท่าเนื้อหา */
+//           width: max-content;
+//         }
+
+//         .ticker-active {
+//            /* เริ่มวิ่งก็ต่อเมื่อ isReady เป็น true แล้วเท่านั้น */
+//            animation: ticker-scroll 20s linear infinite;
+//         }
+//       `}</style>
+
+//       {/* ถ้ายังไม่ Ready (เมนูกำลังเลื่อน) -> เราจะแสดงแค่ Text นิ่งๆ หรือซ่อนไว้ก่อน
+//          เพื่อไม่ให้ GPU ทำงานหนัก
+//       */}
+//       <div
+//         className={cn(
+//           "ticker-track text-sm font-semibold text-zinc-900 dark:text-zinc-100",
+//           // ✅ ใส่ class animation ก็ต่อเมื่อเมนูเปิดเสร็จแล้วเท่านั้น
+//           isReady ? "ticker-active" : "opacity-0 translate-x-full",
+//         )}
+//       >
+//         {text}
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default memo(MarqueeText);
+
 "use client";
 
 import { memo, useEffect, useState } from "react";
@@ -291,13 +364,11 @@ export function MarqueeText({
   running = true,
   text = "📦 ส่งของทุกวัน! สั่งก่อน 12.00 น. ได้ของไวชัวร์! ⏰🚚 ❤️ ขอบคุณลูกค้าทุกท่านที่ไว้ใจเรานะคะ 🙌 แล้วพบกันอีกน้าา~",
 }: MarqueeTextProps) {
-  // ✅ State นี้จะช่วยแก้ปัญหา "เมนูกระตุก" 100%
-  // เราจะยังไม่แสดง Animation จนกว่าเมนูจะเลื่อนเสร็จ (ประมาณ 500-600ms)
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (running) {
-      // รอ 600ms (ให้เมนูเลื่อนเปิดให้เสร็จก่อน) ค่อยเริ่มรันตัววิ่ง
+      // หน่วงเวลาให้เมนูเลื่อนเสร็จก่อน ค่อยแสดงตัววิ่ง (600ms)
       const timer = setTimeout(() => {
         setIsReady(true);
       }, 600);
@@ -308,41 +379,33 @@ export function MarqueeText({
   }, [running]);
 
   return (
-    <div className="relative flex h-full items-center overflow-hidden select-none pointer-events-none">
+    <div
+      className="relative flex w-full h-full items-center overflow-hidden select-none pointer-events-none"
+      style={{ contain: "paint layout" }}
+    >
       <style>{`
+        /* ✅ คืนค่า Keyframes แบบดั้งเดิมของคุณ: เริ่มจากขวาสุด วิ่งไปซ้ายสุด */
         @keyframes ticker-scroll {
-          0% { transform: translate3d(100%, 0, 0); } /* เริ่มจากขวาสุด */
-          100% { transform: translate3d(-100%, 0, 0); } /* วิ่งไปซ้ายสุด */
-        }
-
-        .ticker-track {
-          /* ใช้ will-change เพื่อบอก GPU ให้เตรียมตัว */
-          will-change: transform;
-          /* ใช้ transform 3D เพื่อเปิด Hardware Acceleration */
-          transform: translateZ(0);
-          /* ห้ามขึ้นบรรทัดใหม่ */
-          white-space: nowrap;
-          /* กว้างเท่าเนื้อหา */
-          width: max-content;
-        }
-        
-        .ticker-active {
-           /* เริ่มวิ่งก็ต่อเมื่อ isReady เป็น true แล้วเท่านั้น */
-           animation: ticker-scroll 20s linear infinite;
+          0% { transform: translate3d(100vw, 0, 0); } /* ใช้ 100vw เพื่อให้โผล่มาจากขอบจอพอดี */
+          100% { transform: translate3d(-100%, 0, 0); }
         }
       `}</style>
 
-      {/* ถ้ายังไม่ Ready (เมนูกำลังเลื่อน) -> เราจะแสดงแค่ Text นิ่งๆ หรือซ่อนไว้ก่อน 
-         เพื่อไม่ให้ GPU ทำงานหนัก
-      */}
       <div
         className={cn(
-          "ticker-track text-sm font-semibold text-zinc-900 dark:text-zinc-100",
-          // ✅ ใส่ class animation ก็ต่อเมื่อเมนูเปิดเสร็จแล้วเท่านั้น
-          isReady ? "ticker-active" : "opacity-0 translate-x-full",
+          "flex w-max whitespace-nowrap text-sm font-semibold text-zinc-900 dark:text-zinc-100",
+          // ✅ ถ้าเมนูยังเลื่อนไม่เสร็จ ให้ดันข้อความไปซ่อนไว้ทางขวาก่อน (แบบโค้ดดั้งเดิมของคุณ)
+          !isReady && "translate-x-[100vw]",
         )}
+        style={{
+          willChange: "transform",
+          transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
+          // ✅ พอ isReady ปุ๊บ ก็สั่งให้มันเลื่อนโผล่ออกมาจากทางขวาทันที
+          animation: isReady ? "ticker-scroll 20s linear infinite" : "none",
+        }}
       >
-        {text}
+        <span className="inline-block pr-8">{text}</span>
       </div>
     </div>
   );
