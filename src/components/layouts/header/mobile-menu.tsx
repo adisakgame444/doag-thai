@@ -64,13 +64,48 @@ export function MobileMenu({ user }: MobileMenuProps) {
     }
   }, [isOpen]);
 
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     // เมื่อเมนูเปิด: สั่งเพิ่ม class เพื่อไปหยุดงานหนักๆ ในหน้าหลัง
+  //     document.documentElement.classList.add("menu-open");
+  //   } else {
+  //     // เมื่อเมนูปิด: เอา class ออกเพื่อให้ทุกอย่างกลับมาทำงานปกติ
+  //     document.documentElement.classList.remove("menu-open");
+  //   }
+  // }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     document.documentElement.classList.add("menu-open");
+  //   } else {
+  //     // 🟢 หน่วงเวลาไว้ 400ms (หรือตามเวลาปิดของ Sheet) ก่อนจะเปิดให้หน้าหลังกลับมาขยับ
+  //     const timer = setTimeout(() => {
+  //       document.documentElement.classList.remove("menu-open");
+  //     }, 400);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isOpen]);
+
+  const handleOpenMenu = () => {
+    // 🟢 1. ใส่ Class ทันทีเพื่อหยุด Animation/Blur ข้างหลัง (ถางทางให้ GPU)
+    document.documentElement.classList.add("menu-open");
+
+    // 🟢 2. ใช้ requestAnimationFrame เพื่อให้การเปิดเมนูเกิดขึ้นในเฟรมถัดไปที่ว่าง
+    requestAnimationFrame(() => {
+      setIsOpen(true);
+    });
+  };
+
+  // ปรับ useEffect สำหรับการคุม Class ให้ครอบคลุมทั้งเปิดและปิด
   useEffect(() => {
     if (isOpen) {
-      // เมื่อเมนูเปิด: สั่งเพิ่ม class เพื่อไปหยุดงานหนักๆ ในหน้าหลัง
+      // กรณีเปิด: เราใส่ใน handleOpenMenu ไปแล้ว แต่ใส่กันพลาดไว้อีกชั้นได้ครับ
       document.documentElement.classList.add("menu-open");
     } else {
-      // เมื่อเมนูปิด: เอา class ออกเพื่อให้ทุกอย่างกลับมาทำงานปกติ
-      document.documentElement.classList.remove("menu-open");
+      // กรณีปิด: หน่วงเวลา 400ms เพื่อให้เมนูสไลด์หายไปก่อนค่อยคืนค่าหน้าหลัง
+      const timer = setTimeout(() => {
+        document.documentElement.classList.remove("menu-open");
+      }, 400);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -82,7 +117,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
           <Menu size={20} />
         </Button>
       </SheetTrigger> */}
-      <Button
+      {/* <Button
         variant="ghost"
         size="icon"
         className="md:hidden"
@@ -92,6 +127,14 @@ export function MobileMenu({ user }: MobileMenuProps) {
             setIsOpen(true);
           });
         }}
+      >
+        <Menu size={20} />
+      </Button> */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        onClick={handleOpenMenu} // 🟢 เรียกใช้ฟังก์ชันใหม่
       >
         <Menu size={20} />
       </Button>
