@@ -140,7 +140,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
       </Button>
 
       {/* ✅ กล่องเมนูหลัก */}
-      <SheetContent
+      {/* <SheetContent
         side="left"
         aria-label="เมนูหลักของเว็บไซต์"
         className="will-change-transform translate-z-0 flex h-full w-[80%] sm:w-[70%] md:w-[400px] flex-col overflow-hidden p-0"
@@ -150,6 +150,14 @@ export function MobileMenu({ user }: MobileMenuProps) {
         //   transform: "none",
         // }}
         // forceMount
+      > */}
+      <SheetContent
+        side="left"
+        aria-label="เมนูหลักของเว็บไซต์"
+        // ✅ 1. ลบ translate-z-0 ออก แล้วใช้ transform-gpu แทน (มาตรฐาน Tailwind)
+        // ✅ 2. คง will-change-transform ไว้เพื่อจองเมมโมรี่ล่วงหน้า
+        // ✅ 3. ใส่เงา shadow-2xl หรือ shadow-xl (แทนเงา defualt ของ Shadcn ที่หนักเครื่อง)
+        className="flex h-full w-[80%] sm:w-[70%] md:w-[400px] flex-col overflow-hidden p-0 transform-gpu will-change-transform shadow-xl"
       >
         {/* Header */}
 
