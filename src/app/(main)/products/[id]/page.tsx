@@ -146,7 +146,9 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import db from "@/lib/db";
-import ProductDetail, { ProductDetailPayload } from "./product-detail";
+// import ProductDetail, { ProductDetailPayload } from "./product-detail";
+import ProductDetail from "./components/ProductDetail";
+import { ProductDetailPayload } from "@/types/product-types";
 import { getProductById } from "@/services/products";
 import { getServerSession } from "@/lib/get-session";
 import { DetailPanelSkeleton } from "@/components/skeletons/detail-panel-skeleton";

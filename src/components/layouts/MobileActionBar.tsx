@@ -1830,9 +1830,20 @@ export default function MobileActionBar({
       {/* --------------------------------------------------- */}
       {/* ส่วนที่ 2: กล่องสไลด์ (Drawer) */}
       {/* --------------------------------------------------- */}
-      <div
+      {/* <div
         className={cn(
           "fixed inset-0 z-[60] bg-black/60 backdrop-blur-[2px] transition-all duration-500 ease-in-out md:hidden",
+          isDrawerOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none",
+        )}
+        onClick={() => setIsDrawerOpen(false)}
+      /> */}
+      <div
+        className={cn(
+          // ✅ เปลี่ยน transition-all -> transition-opacity
+          // ✅ เพิ่ม transform-gpu (ช่วยลดภาระ CPU)
+          "fixed inset-0 z-[60] bg-black/60 backdrop-blur-[2px] transition-opacity duration-500 ease-in-out md:hidden transform-gpu",
           isDrawerOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none",
@@ -1841,9 +1852,17 @@ export default function MobileActionBar({
       />
 
       {/* 🟢 ใช้ bg-card เพื่อให้สีเดียวกับแผ่นเมนู MobileMenu */}
-      <div
+      {/* <div
         className={cn(
           "fixed bottom-0 left-0 right-0 z-[70] flex flex-col rounded-t-3xl bg-card p-4 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.15)] text-card-foreground transition-transform duration-500 ease-in-out md:hidden",
+          isDrawerOpen ? "translate-y-0" : "translate-y-full",
+        )}
+      > */}
+      <div
+        className={cn(
+          // ✅ เพิ่ม transform-gpu (ย้ายงานไปที่การ์ดจอ)
+          // ✅ เพิ่ม will-change-transform (จองหน่วยความจำกราฟิกไว้ล่วงหน้า)
+          "fixed bottom-0 left-0 right-0 z-[70] flex flex-col rounded-t-3xl bg-card p-4 pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.15)] text-card-foreground transition-transform duration-500 ease-in-out md:hidden transform-gpu will-change-transform",
           isDrawerOpen ? "translate-y-0" : "translate-y-full",
         )}
       >
