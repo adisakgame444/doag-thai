@@ -233,7 +233,7 @@ export function UserAvatar({ user }: UserAvatarProps) {
               // ผลลัพธ์: ถ้าเป็นรูปจาก Google มันจะดึง link ตรงมาแสดงเลย (เร็วและฟรี)
               unoptimized={true}
               className="
-                rounded-full object-cover shadow-lg 
+                rounded-full object-cover shadow-lg
                 relative z-10 border-2 border-white dark:border-zinc-700
               "
               referrerPolicy="no-referrer"

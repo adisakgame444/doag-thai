@@ -471,10 +471,20 @@ export default function Hero() {
   const features = useMemo(() => HERO_FEATURES, []);
 
   return (
+    // <section
+    //   ref={heroRef}
+    //   className="relative w-full overflow-hidden min-h-full transform-gpu"
+    //   style={{ backfaceVisibility: "hidden" }}
+    // >
     <section
       ref={heroRef}
-      className="relative w-full overflow-hidden min-h-full transform-gpu"
-      style={{ backfaceVisibility: "hidden" }}
+      // 🟢 เพิ่ม isolation-auto ต่อท้ายเข้าไปครับ
+      className="relative w-full overflow-hidden min-h-full transform-gpu isolation-auto"
+      style={{
+        backfaceVisibility: "hidden",
+        // 🟢 เพิ่ม contain: "paint" เข้าไปใน style ครับ
+        contain: "paint",
+      }}
     >
       {/* ✅ Background loads first */}
       <HeroBackground />
@@ -595,7 +605,7 @@ export default function Hero() {
             </motion.div>
 
             {/* RIGHT — Slider */}
-            <div className="will-change-transform -mx-2 md:mx-0">
+            <div className="-mx-2 md:mx-0">
               {showSlider ? (
                 <HeroProductSlider autoplayStart={bgLoaded && heroAnimReady} />
               ) : (

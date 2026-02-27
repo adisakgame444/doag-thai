@@ -466,6 +466,21 @@ html, body {
   }
 }
 
+/* ในไฟล์ globals.css */
+
+/* เมื่อเมนูเปิด ให้ "หยุด" การทำงานของ GPU และ Main Thread ในหน้าหลัง */
+.menu-open .animate-pulse,
+.menu-open .motion-safe\:animate-spin {
+  animation-play-state: paused !important;
+}
+
+/* ปิดการทำ Blur ที่กินสเปกสูงชั่วคราวขณะเมนูสไลด์ */
+.menu-open .backdrop-blur-md,
+.menu-open .backdrop-blur-xl {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

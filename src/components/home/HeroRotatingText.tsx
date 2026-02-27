@@ -38,7 +38,7 @@ export const HeroRotatingText = memo(() => {
   return (
     // <span className="relative inline-flex justify-center items-center h-[2rem] w-full overflow-hidden align-middle">
     <span className="relative inline-flex items-center h-[2rem] w-full overflow-hidden">
-      <AnimatePresence mode="wait">
+      {/* <AnimatePresence mode="wait">
         <motion.span
           key={index}
           initial={{ y: 8, opacity: 0 }}
@@ -55,10 +55,35 @@ export const HeroRotatingText = memo(() => {
           // className="absolute w-full text-center transform-gpu will-change-transform"
           // className="absolute left-0 w-full text-left text-xs text-white/60 transform-gpu will-change-transform"
           // className="absolute left-0 w-full text-left text-xs md:text-sm text-white/50 leading-none truncate transform-gpu will-change-transform mt-1"
-          className="absolute left-0 w-full text-left text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-none truncate transform-gpu will-change-transform mt-1"
+          className="absolute left-0 w-full text-left text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-none truncate transform-gpu mt-1"
           style={{
             transform: "translateZ(0)",
             willChange: "transform, opacity, filter",
+          }}
+        >
+          {texts[index]}
+        </motion.span>
+      </AnimatePresence> */}
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={index}
+          initial={{ y: 8, opacity: 0 }}
+          animate={{
+            y: 0,
+            opacity: paused ? 0.5 : 1,
+            // ❌ ลบ filter: blur ออก เพราะมันกินสเปกเครื่องมหาศาลตอนเปิดเมนู
+          }}
+          exit={{ y: -8, opacity: 0 }}
+          transition={{
+            duration: 0.6, // ปรับให้ไวขึ้นเล็กน้อย (0.6 นานไปหน่อยสำหรับ placeholder)
+            ease: [0.22, 1, 0.36, 1], // ใช้ Cubic Bezier ที่ลื่นไหลกว่า
+          }}
+          className="absolute left-0 w-full text-left text-xs md:text-sm text-zinc-700 dark:text-zinc-300 leading-none truncate mt-1"
+          style={{
+            // ✅ ใช้แค่ transform กับ opacity พอครับ
+            willChange: "transform, opacity",
+            // ✅ บังคับใช้ GPU เฉพาะการเคลื่อนที่ (ลื่นและประหยัด)
+            transform: "translateZ(0)",
           }}
         >
           {texts[index]}

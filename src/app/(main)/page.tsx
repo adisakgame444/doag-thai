@@ -87,11 +87,11 @@ export default function MainPage() {
   return (
     <div className="flex flex-col">
       <Hero />
-      <Suspense
+      {/* <Suspense
         fallback={<BannerSkeleton className="container mx-auto px-4 py-6" />}
       >
-        {/* <RecommendedBanner /> */}
-      </Suspense>
+        <RecommendedBanner />
+      </Suspense> */}
       <Suspense fallback={<HomeFeatureSkeleton />}>
         <FeatureProducts />
       </Suspense>

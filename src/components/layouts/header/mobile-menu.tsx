@@ -64,14 +64,37 @@ export function MobileMenu({ user }: MobileMenuProps) {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      // เมื่อเมนูเปิด: สั่งเพิ่ม class เพื่อไปหยุดงานหนักๆ ในหน้าหลัง
+      document.documentElement.classList.add("menu-open");
+    } else {
+      // เมื่อเมนูปิด: เอา class ออกเพื่อให้ทุกอย่างกลับมาทำงานปกติ
+      document.documentElement.classList.remove("menu-open");
+    }
+  }, [isOpen]);
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       {/* ปุ่มเปิดเมนู */}
-      <SheetTrigger className="md:hidden" aria-label="เปิดเมนูมือถือ" asChild>
+      {/* <SheetTrigger className="md:hidden" aria-label="เปิดเมนูมือถือ" asChild>
         <Button variant="ghost" size="icon">
           <Menu size={20} />
         </Button>
-      </SheetTrigger>
+      </SheetTrigger> */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        onClick={() => {
+          // 🟢 ใช้ requestAnimationFrame เพื่อให้เบราว์เซอร์ Paint งานที่ค้างอยู่ให้เสร็จก่อนเริ่มเปิดเมนู
+          requestAnimationFrame(() => {
+            setIsOpen(true);
+          });
+        }}
+      >
+        <Menu size={20} />
+      </Button>
 
       {/* ✅ กล่องเมนูหลัก */}
       <SheetContent
@@ -164,144 +187,3 @@ export function MobileMenu({ user }: MobileMenuProps) {
     </Sheet>
   );
 }
-
-// "use client";
-
-// import { useState, useEffect, memo } from "react";
-// import Link from "next/link";
-// import { Menu, User2, LogIn, MessageCircleHeartIcon } from "lucide-react";
-
-// import { Button } from "@/components/ui/button";
-// import { Separator } from "@/components/ui/separator";
-// import {
-//   Sheet,
-//   SheetContent,
-//   SheetFooter,
-//   SheetHeader,
-//   SheetTitle,
-//   SheetTrigger,
-// } from "@/components/ui/sheet";
-
-// // Components
-// import { AuthButtons, SignOutButton, UserAvatar } from "./user-comp";
-// import { MobileNavigationLinks } from "./navigation-links";
-// import { MarqueeText } from "./marquee-text";
-// import { ThemeToggle } from "@/components/theme-toggle";
-
-// // Types
-// import { User } from "@/lib/auth"; // หรือ path ที่ถูกต้องของคุณ
-
-// interface MobileMenuProps {
-//   user?: User;
-// }
-
-// /**
-//  * ✅ เมนูมือถือฉบับ Optimize (Native Scroll + Memoized)
-//  */
-// export const MobileMenu = memo(function MobileMenu({ user }: MobileMenuProps) {
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   // ✅ ส่ง event บอก component อื่น (เช่น Slider) ว่าเมนูเปิดอยู่
-//   useEffect(() => {
-//     const event = new CustomEvent("mobileMenuToggle", { detail: { isOpen } });
-//     window.dispatchEvent(event);
-//   }, [isOpen]);
-
-//   return (
-//     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-//       {/* ปุ่ม Hamburger */}
-//       <SheetTrigger className="md:hidden" aria-label="เปิดเมนูมือถือ" asChild>
-//         <Button variant="ghost" size="icon" className="shrink-0">
-//           <Menu size={20} />
-//         </Button>
-//       </SheetTrigger>
-
-//       {/* กล่องเมนู */}
-//       <SheetContent
-//         side="left"
-//         aria-label="เมนูหลัก"
-//         // ✅ ปรับ Layout ให้เต็มจอและจัดการ Scroll เอง
-//         className="flex h-full w-[85%] sm:w-[70%] md:w-[400px] flex-col gap-0 p-0"
-//       >
-//         {/* --- ส่วนหัว (Header) --- */}
-//         <SheetHeader className="px-6 py-5 border-b border-border/40">
-//           <div className="flex items-center justify-between">
-//             {/* ป้ายสถานะ User */}
-//             <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1.5 border border-primary/20">
-//               <SheetTitle className="flex items-center gap-2 text-sm font-medium text-primary">
-//                 {user ? (
-//                   <>
-//                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
-//                       <User2 size={12} />
-//                     </div>
-//                     <span>โปรไฟล์ของคุณ</span>
-//                   </>
-//                 ) : (
-//                   <>
-//                     <LogIn size={14} />
-//                     <span>ยินดีต้อนรับ</span>
-//                   </>
-//                 )}
-//               </SheetTitle>
-//             </div>
-
-//             {/* ปุ่มเปลี่ยนธีม */}
-//             <ThemeToggle />
-//           </div>
-//         </SheetHeader>
-
-//         {/* --- ส่วนเนื้อหา (Scrollable Area) --- */}
-//         {/* ✅ ใช้ Native Scroll (overflow-y-auto) แทน ScrollArea เพื่อความลื่นไหลบนมือถือ */}
-//         <div className="flex-1 overflow-y-auto px-4 py-4 scroll-smooth overscroll-contain">
-//           {/* Avatar / Auth Buttons */}
-//           <div className="mb-4">
-//             {user ? <UserAvatar user={user} /> : <AuthButtons />}
-//           </div>
-
-//           {/* Marquee Section */}
-//           {user && (
-//             <div className="mb-4 flex items-center gap-0.5 overflow-hidden rounded-lg border border-border/50 bg-accent/20 p-1">
-//               <div className="flex shrink-0 items-center gap-1 rounded bg-blue-600 px-2 py-1 text-[10px] font-bold text-white shadow-sm">
-//                 <span>NEW</span>
-//                 <MessageCircleHeartIcon size={12} className="text-white" />
-//               </div>
-//               <div className="flex-1 overflow-hidden">
-//                 <MarqueeText running={isOpen} />
-//               </div>
-//             </div>
-//           )}
-
-//           <Separator className="my-2" />
-
-//           {/* Navigation Links */}
-//           <nav className="flex flex-col gap-1 py-2">
-//             <MobileNavigationLinks />
-//           </nav>
-
-//           {/* Admin Menu (แสดงเฉพาะ Admin) */}
-//           {user?.role === "admin" && (
-//             <div className="mt-4">
-//               <Separator className="mb-4" />
-//               <Button
-//                 variant="destructive"
-//                 className="w-full justify-center gap-2 rounded-xl shadow-sm"
-//                 asChild
-//                 // ✅ กดแล้วปิดเมนูทันที
-//                 onClick={() => setIsOpen(false)}
-//               >
-//                 <Link href="/admin">เข้าสู่ระบบหลังบ้าน</Link>
-//               </Button>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* --- ส่วนท้าย (Footer) --- */}
-//         {user && (
-//           <SheetFooter className="mt-auto border-t border-border bg-muted/30 px-6 py-4">
-//             <SignOutButton isMobile />
-//           </SheetFooter>
-//         )}
-//       </SheetContent>
-//     </Sheet>
-//   );
-// });
