@@ -228,6 +228,24 @@ async function ProductDetailSection({
     notFound();
   }
 
+  let defaultAddressId: string | null = null;
+  if (userId) {
+    // หาที่อยู่ที่ถูกตั้งเป็นค่าเริ่มต้น (isDefault: true)
+    const address = await db.address.findFirst({
+      where: { userId: userId, isDefault: true },
+    });
+
+    if (address) {
+      defaultAddressId = address.id;
+    } else {
+      // ถ้าไม่มีที่อยู่ default ให้ลองดึงที่อยู่อันแรกที่เคยเพิ่มไว้มาแทน
+      const fallbackAddress = await db.address.findFirst({
+        where: { userId: userId },
+      });
+      defaultAddressId = fallbackAddress?.id ?? null;
+    }
+  }
+
   // 🟢🟢 2. เช็ควิธีชำระเงินของออเดอร์เดิม 🟢🟢
   let originalPaymentMethod: PaymentMethod | null = null;
   // 👇👇 [ส่วนที่หายไป] ต้องเพิ่ม Logic นี้กลับเข้ามาครับ! 👇👇
@@ -236,16 +254,16 @@ async function ProductDetailSection({
       where: { id: replacementTargetId },
       select: {
         order: {
-          select: { paymentMethod: true }
-        }
-      }
+          select: { paymentMethod: true },
+        },
+      },
     });
 
     // ถ้าเจอข้อมูล ให้เอาค่ามาใส่ตัวแปร
     if (originalItem) {
       originalPaymentMethod = originalItem.order.paymentMethod;
     }
-  } 
+  }
   // ... (Logic เช็คสิทธิ์รีวิวของคุณ ถูกต้องแล้วครับ) ...
   let canReview = false;
   if (userId) {
@@ -317,6 +335,7 @@ async function ProductDetailSection({
       replacementTargetId={replacementTargetId}
       // 3. ส่งค่าวิธีชำระเงินเดิมไปหน้าจอ
       originalPaymentMethod={originalPaymentMethod}
+      defaultAddressId={defaultAddressId}
     />
   );
 }

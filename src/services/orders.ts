@@ -2435,7 +2435,9 @@ const orderWithRelations = {
         },
       },
     },
-    payments: true,
+    payments: {
+      orderBy: { createdAt: "asc" },
+    },
   },
 } satisfies Prisma.OrderDefaultArgs;
 
@@ -2784,7 +2786,7 @@ export async function listOrdersByUser(
           },
         },
         payments: {
-          orderBy: { id: "asc" },
+          orderBy: { createdAt: "asc" },
         },
       },
     });
@@ -2852,7 +2854,7 @@ export async function listOrders(
             // 🚩 แก้จุดที่ 1: รายการสินค้าข้างใน ให้ใช้ id: "asc"
             // เพราะเวลาลูกค้ากดสั่ง ข้อมูลจะถูกบันทึกพร้อมกันเป๊ะจน createdAt เท่ากัน
             // การเรียงตาม id จะช่วยให้มันนิ่งที่สุด ไม่ว่าแอดมินจะกดอะไร
-            orderBy: { id: "asc" },
+           orderBy: { id: "asc" },
             include: {
               weight: true,
               product: true,
@@ -2861,7 +2863,7 @@ export async function listOrders(
           payments: {
             // 🚩 แก้จุดที่ 2: สลิปการชำระเงิน ก็ใช้ id: "asc"
             // เพื่อให้สลิปใบที่ 1, 2, 3 เรียงลำดับเดิมเสมอ
-            orderBy: { id: "asc" },
+            orderBy: { createdAt: "asc" },
           },
         },
         skip: pagination.skip,
@@ -2869,9 +2871,6 @@ export async function listOrders(
       }),
       db.order.count({ where }),
     ]);
-
-    console.log("--- DEBUG ORDERS DATA ---");
-    console.log(JSON.stringify(orders[0]?.items[0], null, 2));
 
     const meta = createPaginationMeta(total, {
       page: pagination.page,

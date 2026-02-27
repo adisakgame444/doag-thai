@@ -37,17 +37,30 @@ export function MobileMenu({ user }: MobileMenuProps) {
   //   const event = new CustomEvent("mobileMenuToggle", { detail: { isOpen } });
   //   window.dispatchEvent(event);
   // }, [isOpen]);
+  // useEffect(() => {
+  //   const event = new CustomEvent("mobileMenuToggle", { detail: { isOpen } });
+  //   window.dispatchEvent(event);
+
+  //   // 🔴 2. เพิ่มโค้ดบล็อกนี้: หน่วงเวลาของหนักๆ ไว้ 500ms
+  //   if (isOpen) {
+  //     // รอให้เมนูเลื่อนจบก่อน (500ms) แล้วค่อยเปลี่ยนค่าเป็น true
+  //     const timer = setTimeout(() => setIsFullyOpen(true), 500);
+  //     return () => clearTimeout(timer);
+  //   } else {
+  //     setIsFullyOpen(false); // ถ้าปิดเมนู ให้รีเซ็ตกลับทันที
+  //   }
+  // }, [isOpen]);
   useEffect(() => {
     const event = new CustomEvent("mobileMenuToggle", { detail: { isOpen } });
     window.dispatchEvent(event);
 
-    // 🔴 2. เพิ่มโค้ดบล็อกนี้: หน่วงเวลาของหนักๆ ไว้ 500ms
     if (isOpen) {
-      // รอให้เมนูเลื่อนจบก่อน (500ms) แล้วค่อยเปลี่ยนค่าเป็น true
-      const timer = setTimeout(() => setIsFullyOpen(true), 500);
+      // ✅ ปรับตัวเลขให้สัมพันธ์กับ CSS (ถ้า CSS คือ 600ms ตรงนี้ควรเป็น 600 หรือ 700)
+      // การบวกเพิ่ม 50-100ms จะช่วยให้ชัวร์ว่า GPU สลับโหมดจาก Slide มาเป็น Marquee ได้เนียนกริบ
+      const timer = setTimeout(() => setIsFullyOpen(true), 650);
       return () => clearTimeout(timer);
     } else {
-      setIsFullyOpen(false); // ถ้าปิดเมนู ให้รีเซ็ตกลับทันที
+      setIsFullyOpen(false);
     }
   }, [isOpen]);
 

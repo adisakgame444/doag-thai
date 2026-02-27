@@ -52,23 +52,25 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/50",
-        // 1. ใช้ความเร็วที่ "เร็วกว่าเมนู" (เช่น 300-400ms)
-        // เพื่อให้ Overlay ทำงานจบก่อนที่เมนูจะเลื่อนมาถึงจุดกลางจอ ลดภาระ CPU ซ้อนทับกัน
+        "fixed inset-0 z-50 bg-black/40", // ลด Opacity ลงเล็กน้อยเพื่อลดภาระการผสมสี (Alpha blending)
+
+        // 1. ลดจังหวะการเฟดให้สั้นที่สุด (75ms - 150ms) เพื่อไม่ให้ GPU แช่อยู่กับงานค้างนาน
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
-        "data-[state=open]:duration-400 data-[state=closed]:duration-300",
+        "duration-150", // เร็วมากจนแทบไม่กินทรัพยากร
 
-        // 2. ใช้ Easing แบบ Linear หรือ Ease-out ธรรมดา
-        // ไม่ต้องใช้ Cubic-bezier ซับซ้อนเหมือนเมนู เพราะ Opacity ไม่ต้องการความ "ดีด"
-        "ease-out",
-
-        // 3. หัวใจสำคัญ: บังคับแยก Layer (Hardware Acceleration)
-        // เพื่อไม่ให้การคำนวณ Opacity ไปรบกวนการคำนวณ Transform ของ SheetContent
+        // 2. ใช้ Hardware Acceleration บังคับแยก Layer
         "transform-gpu will-change-opacity",
+
+        // 3. ป้องกันการวาดซ้ำในส่วนที่ไม่เกี่ยวข้อง
+        "pointer-events-auto",
 
         className,
       )}
+      style={{
+        // 🔹 คำสั่งระดับ Low-level เพื่อบอกเบราว์เซอร์ว่าไม่ต้องคำนวณอะไรที่อยู่หลัง Overlay นี้
+        contain: "strict",
+      }}
       {...props}
     />
   );
@@ -88,74 +90,15 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          // "bg-background will-change-transform data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-300",
-          // side === "right" &&
-          //   "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
-          // side === "left" &&
-          //   "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-          // side === "top" &&
-          //   "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
-          // side === "bottom" &&
-          //   "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
-          // className,
-          // 1. พื้นฐานและ z-index
-          // "bg-background fixed z-50 flex flex-col gap-4 shadow-lg",
-          // // 2. การทำ Animation (เพิ่มความนุ่มนวลด้วย cubic-bezier)
-          // "transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]",
-          // "data-[state=open]:animate-in data-[state=closed]:animate-out",
-          // // 3. ปรับเวลาเปิด-ปิดให้เท่ากันเพื่อความต่อเนื่อง
-          // "data-[state=open]:duration-500 data-[state=closed]:duration-400",
-          // // 4. บังคับ Hardware Acceleration
-          // "will-change-transform transform-gpu translate-z-0",
-
-          // side === "right" &&
-          //   "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
-          // side === "left" &&
-          //   "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-
-          // "bg-background fixed z-50 flex flex-col shadow-lg",
-
-          // // 1. กำหนดความเร็วให้ช้าลง (เพิ่มเป็น 700ms - 800ms)
-          // // data-[state=open]:duration-800 คือตอนเปิด (ช้าแบบนุ่มๆ)
-          // // data-[state=closed]:duration-500 คือตอนปิด (เร็วกว่าตอนเปิดนิดหนึ่งเพื่อให้ไม่ดูหน่วงเกินไป)
-          // "transition-transform ease-[cubic-bezier(0.16,1,0.3,1)]",
-          // "data-[state=open]:animate-in data-[state=closed]:animate-out",
-          // "data-[state=open]:duration-800 data-[state=closed]:duration-500",
-
-          // // 2. Hardware Acceleration (ใส่ไว้เหมือนเดิมเพื่อให้ความช้าดูนิ่ง ไม่กระตุก)
-          // "will-change-transform transform-gpu backface-visibility-hidden",
-
-          // side === "right" &&
-          //   "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
-          // side === "left" &&
-          //   "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-
-          // className,
-
-          "bg-background fixed z-50 flex flex-col shadow-lg",
-
-          // 1. ลดภาระการคำนวณ: ใช้แค่ transform เท่านั้น (ห้าม opacity ถ้าไม่จำเป็น)
-          // เพราะ transform เป็น Property ที่ GPU ประมวลผลได้โดยไม่ต้องคำนวณ Layout ใหม่
-          "transition-transform",
-
-          // 2. กำหนดจังหวะ: ใช้ Cubic Bezier ที่เรียบง่ายแต่สมูท
-          "ease-[cubic-bezier(0.25,1,0.5,1)]",
-
-          // 3. กำหนดเวลา: ช้าแบบนุ่มนวล (เปิด 700ms / ปิด 400ms)
-          "data-[state=open]:animate-in data-[state=closed]:animate-out",
-          "data-[state=open]:duration-1200 data-[state=closed]:duration-900",
-
-          // 4. ทีเด็ดการประหยัดทรัพยากร:
-          // transform-gpu: ใช้การ์ดจอทำ
-          // backface-visibility-hidden: ลดการคำนวณภาพด้านหลัง
-          // contain-strict: บอกบราวเซอร์ว่าไม่ต้องไปยุ่งกับข้างนอกเมนู ลดภาระการวาดภาพ (Paint)
-          "transform-gpu backface-visibility-hidden will-change-transform",
-
+          "bg-background will-change-transform data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-800 data-[state=open]:duration-800",
           side === "right" &&
             "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
           side === "left" &&
             "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-
+          side === "top" &&
+            "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
+          side === "bottom" &&
+            "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
           className,
         )}
         style={{

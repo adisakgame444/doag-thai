@@ -73,6 +73,9 @@ import { isActivePath } from "./header/navigation.config";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  if (pathname.startsWith("/products/")) {
+    return null;
+  }
   const mobileMenuItems = NAVIGATION_ITEMS.filter((item) => !item.desktopOnly);
 
   return (

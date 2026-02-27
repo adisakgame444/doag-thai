@@ -544,6 +544,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import MobileActionBar from "@/components/layouts/MobileActionBar";
 
 const FALLBACK_IMAGE = "/images/no-product-image.webp";
 
@@ -625,6 +626,7 @@ export default function ProductDetail({
   canReview,
   replacementTargetId, // ✅ รับค่าจาก parent component
   originalPaymentMethod, // ✅ 1. รับค่า
+  defaultAddressId,
 }: {
   product: ProductDetailPayload;
   userId: string | null;
@@ -632,6 +634,7 @@ export default function ProductDetail({
   canReview: boolean; // <-- ตัวแปรสำคัญ
   replacementTargetId?: string;
   originalPaymentMethod?: string | null;
+  defaultAddressId?: string | null; // 🟢 เพิ่ม Type ตรงนี้ด้วย
 }) {
   const [activeImageId, setActiveImageId] = useState<string | null>(
     product.images[0]?.id ?? null,
@@ -1102,6 +1105,125 @@ export default function ProductDetail({
     });
   };
 
+  // const handleBuyNow = () => {
+  //   if (
+  //     !selectedWeight ||
+  //     !hasPrice ||
+  //     isSoldOut ||
+  //     maxQuantity <= 0 ||
+  //     quantity > maxQuantity
+  //   )
+  //     return;
+
+  //   if (!isAuthenticated || !userId) {
+  //     toast.error("กรุณาเข้าสู่ระบบเพื่อสั่งซื้อ");
+  //     router.push(`/sign-in?redirect=/products/${product.id}`);
+  //     return;
+  //   }
+
+  //   startTransition(async () => {
+  //     // 1. แอดสินค้าเข้าตะกร้าก่อนเหมือนปกติ
+  //     const result = await addCartItemAction({
+  //       productId: product.id,
+  //       weightId: selectedWeight.id,
+  //       quantity,
+  //     });
+
+  //     if (!result.success || !result.cart) {
+  //       toast.error(result.message ?? "ไม่สามารถดำเนินการได้");
+  //       return;
+  //     }
+
+  //     syncFromServer(userId, result.cart);
+  //     toast.success("กำลังพาไปยังหน้าชำระเงิน...");
+
+  //     const addedItem = result.cart.find(
+  //       (item: any) =>
+  //         item.productId === product.id && item.weightId === selectedWeight.id,
+  //     );
+  //     // 2. หา ID ของ Item ที่เพิ่งแอดเข้าไป (สมมติว่าใน result.cart.items มีข้อมูลตะกร้าส่งกลับมา)
+  //     // *หมายเหตุ: เปลี่ยนชื่อตัวแปร items ให้ตรงกับ Schema ของคุณ หากคุณใช้ชื่ออื่น
+
+  //     const cartItemId = addedItem?.id;
+
+  //     if (!cartItemId) {
+  //       // ถ้าหา ID ไม่เจอ (เผื่อไว้) ให้เด้งไปหน้าตะกร้ารวมแทน
+  //       router.push("/cart");
+  //       return;
+  //     }
+
+  //     // 3. เช็คว่ามีที่อยู่หรือไม่ แล้วเด้งไป URL ที่ถูกต้อง
+  //     // (เราจะรับค่า defaultAddressId มาจาก Server ในขั้นตอนที่ 3)
+  //     if (defaultAddressId) {
+  //       router.push(
+  //         `/checkout/payment?items=${cartItemId}&address=${defaultAddressId}`,
+  //       );
+  //     } else {
+  //       router.push(`/checkout?items=${cartItemId}`);
+  //     }
+  //   });
+  // };
+
+  const handleBuyNow = () => {
+    // 1. เช็คเงื่อนไขพื้นฐาน
+    if (
+      !selectedWeight ||
+      !hasPrice ||
+      isSoldOut ||
+      maxQuantity <= 0 ||
+      quantity > maxQuantity
+    )
+      return;
+
+    // 2. เช็คการล็อกอิน
+    if (!isAuthenticated || !userId) {
+      toast.error("กรุณาเข้าสู่ระบบเพื่อสั่งซื้อ");
+      router.push(`/sign-in?redirect=/products/${product.id}`);
+      return;
+    }
+
+    startTransition(async () => {
+      // 3.1 แอดสินค้าเข้าตะกร้า (ระบบหลังบ้านจะจัดการบวกจำนวนกับของเก่าให้เอง)
+      const result = await addCartItemAction({
+        productId: product.id,
+        weightId: selectedWeight.id,
+        quantity,
+      });
+
+      if (!result.success || !result.cart) {
+        toast.error(result.message ?? "ไม่สามารถดำเนินการได้");
+        return;
+      }
+
+      // 🟢 3.2 อย่าลืม sync ข้อมูลให้ตะกร้าหน้าจอมือถืออัปเดตตรงกับหลังบ้าน
+      syncFromServer(userId, result.cart);
+
+      if (defaultAddressId) {
+        toast.success("กำลังพาไปยังหน้าชำระเงิน...");
+      } else {
+        toast.success("กำลังพาไปเพิ่มที่อยู่...");
+      }
+
+      // 🟢 3.3 กวาด ID ของ "ทุกชิ้น" ในตะกร้ามามัดรวมกัน (คั่นด้วยลูกน้ำ)
+      const allCartItemIds = result.cart.map((item: any) => item.id).join(",");
+
+      if (!allCartItemIds) {
+        // ถ้าตะกร้าว่างเปล่า ให้เด้งกลับหน้าตะกร้า
+        router.push("/cart");
+        return;
+      }
+
+      // 🟢 3.4 ส่งไปหน้า Checkout พร้อมรหัสสินค้าทั้งหมด! (ไม่ต้องมี buyNowQty แล้ว)
+      if (defaultAddressId) {
+        router.push(
+          `/checkout/payment?items=${allCartItemIds}&address=${defaultAddressId}`,
+        );
+      } else {
+        router.push(`/checkout?items=${allCartItemIds}`);
+      }
+    });
+  };
+
   const disableCartButton =
     !selectedWeight ||
     !hasPrice ||
@@ -1246,7 +1368,7 @@ export default function ProductDetail({
             </div>
 
             {/* ฝั่งขวา: ช่อง Select (กำหนดความกว้างคงที่เพื่อให้ขนานกับราคาได้พอดี) */}
-            <div className="flex flex-col gap-1 w-[160px] shrink-0">
+            <div className=" hidden md:flex flex-col gap-1 w-[160px] shrink-0">
               <span className="text-[11px] font-medium text-muted-foreground">
                 {product.type === "UNIT" ? "เลือกตัวเลือก" : "เลือกน้ำหนัก"}
               </span>
@@ -1311,10 +1433,10 @@ export default function ProductDetail({
             </div>
           </div>
 
-          <Separator />
+          <Separator className="hidden md:block" />
 
           {/* จำนวนสินค้า */}
-          <div className="space-y-4">
+          <div className="hidden md:block space-y-4">
             {/* ✅ ใช้ Grid: แบ่งพื้นที่เป็น [ซ้าย:ยืดหยุ่น_ขวา:เท่าปุ่มกด] เพื่อไม่ให้เบียดกัน */}
             <div className="mt-4 grid grid-cols-[1fr_auto] items-start gap-4">
               {/* ================== ฝั่งซ้าย (Stock & Selected) ================== */}
@@ -1421,7 +1543,7 @@ export default function ProductDetail({
             </div>
           </div>
 
-          <div className="space-y-3 rounded-2xl border border-border/60 bg-muted/40 px-5 py-4">
+          <div className="hidden md:block space-y-3 rounded-2xl border border-border/60 bg-muted/40 px-5 py-4">
             <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-background/50 p-5 backdrop-blur-sm">
               {/* Decoration */}
               <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-emerald-500/5 blur-2xl" />
@@ -1585,9 +1707,9 @@ export default function ProductDetail({
           </div>
         </div>
 
-        <Separator />
+        <Separator className="hidden md:block" />
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <h2 className="text-lg font-semibold text-foreground">
             รายละเอียดสินค้า
           </h2>
@@ -1846,6 +1968,43 @@ export default function ProductDetail({
           )}
         </DialogContent>
       </Dialog>
+      {/* <MobileActionBar
+        replacementTargetId={replacementTargetId}
+        isCodRestricted={isCodRestricted}
+        disableCartButton={disableCartButton}
+        isPending={isPending}
+        isSoldOut={isSoldOut}
+        totalPrice={totalPrice}
+        handleAddToCart={handleAddToCart}
+        handleReplaceItem={handleReplaceItem}
+      /> */}
+      <MobileActionBar
+        replacementTargetId={replacementTargetId}
+        isCodRestricted={isCodRestricted}
+        disableCartButton={disableCartButton}
+        isPending={isPending}
+        isSoldOut={isSoldOut}
+        handleAddToCart={handleAddToCart}
+        handleReplaceItem={handleReplaceItem}
+        unitLabel={product.unitLabel}
+        // 🟢 ส่งข้อมูลไปให้ Drawer ทำงาน
+        productTitle={product.title}
+        displayImage={displayImage}
+        unitPriceLabel={unitPriceLabel}
+        stock={product.stock}
+        productType={product.type}
+        preparedWeightOptions={preparedWeightOptions}
+        selectedWeightId={selectedWeightId}
+        setSelectedWeightId={setSelectedWeightId}
+        quantity={quantity}
+        maxQuantity={maxQuantity}
+        incrementQuantity={incrementQuantity}
+        decrementQuantity={decrementQuantity}
+        basePriceLabel={basePriceLabel}
+        discountPercent={discountPercent}
+        totalPrice={totalPrice}
+        handleBuyNow={handleBuyNow} // 🟢 2. ส่งฟังก์ชันนี้ให้ Component
+      />
     </div>
   );
 }
